@@ -6,7 +6,7 @@ import 'package:dio/dio.dart';
 
 class AuthService {
   static const endpoint = 'Auth';
-  Future<LoginResponse> login(LoginRequest request) async {
+  Future<LoginResponse?> login(LoginRequest request) async {
     try {
       const url = '${Constants.BASE_URL}/$endpoint/login';
       print(url);
@@ -14,7 +14,7 @@ class AuthService {
           LoginResponse.fromJson(BaseResponse.fromJson(value.data).data));
       return res;
     } catch (e) {
-      rethrow;
+      return null;
     }
   }
 }
