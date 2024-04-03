@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:buzz_hub/modules/login/views/login_page.dart';
+import 'package:buzz_hub/modules/login/views/register_page.dart';
 import 'package:buzz_hub/services/auth_service.dart';
 import 'package:buzz_hub/services/dto/login_request.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +24,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         fontFamily: 'Manrope',
       ),
-      home: LoginPage(),
+      home: RegisterPage(),
       debugShowCheckedModeBanner: false,
     );
   }
