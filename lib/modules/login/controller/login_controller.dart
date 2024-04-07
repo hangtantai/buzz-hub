@@ -1,7 +1,9 @@
+import 'package:buzz_hub/core/values/constant.dart';
 import 'package:buzz_hub/services/auth_service.dart';
-import 'package:buzz_hub/services/dto/login_request.dart';
+import 'package:buzz_hub/services/dto/requests/login_request.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginController extends GetxController {
   TextEditingController usernameCtrl = TextEditingController();
@@ -14,6 +16,9 @@ class LoginController extends GetxController {
     if (res == null) {
       return false;
     }
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString(Constants.ACCESS_TOKEN, res.accessToken);
+    await prefs.setString(Constants.REFRESH_TOKEN, res.refreshToken);
     return true;
   }
 }

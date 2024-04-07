@@ -1,5 +1,6 @@
 import 'package:buzz_hub/core/values/app_colors.dart';
 import 'package:buzz_hub/modules/login/controller/login_controller.dart';
+import 'package:buzz_hub/modules/login/views/conversation_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
@@ -73,30 +74,8 @@ class LoginPage extends StatelessWidget {
               onTap: () async {
                 bool isSuccess = await controller.onLogin();
                 if (isSuccess) {
-                  showDialog<void>(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Text('Thông báo'),
-                        content: const Text(
-                          'Đăng nhập thành công',
-                        ),
-                        actions: <Widget>[
-                          TextButton(
-                            style: TextButton.styleFrom(
-                              textStyle: Theme.of(context).textTheme.labelLarge,
-                            ),
-                            child: const Text('OK'),
-                            onPressed: () {
-                              Get.back();
-                            },
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                }
-                else {
+                  Get.to(ConversationPage());
+                } else {
                   showDialog<void>(
                     context: context,
                     builder: (BuildContext context) {

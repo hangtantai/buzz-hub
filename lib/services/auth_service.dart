@@ -1,8 +1,8 @@
 import 'package:buzz_hub/core/values/constant.dart';
 import 'package:buzz_hub/services/base_response.dart';
-import 'package:buzz_hub/services/dto/login_request.dart';
-import 'package:buzz_hub/services/dto/login_response.dart';
-import 'package:buzz_hub/services/dto/register_request.dart';
+import 'package:buzz_hub/services/dto/requests/login_request.dart';
+import 'package:buzz_hub/services/dto/responses/login_response.dart';
+import 'package:buzz_hub/services/dto/requests/register_request.dart';
 import 'package:dio/dio.dart';
 
 class AuthService {
