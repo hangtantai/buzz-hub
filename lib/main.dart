@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:buzz_hub/modules/auth/views/forgot_password_page.dart';
 import 'package:buzz_hub/modules/message/views/message_list_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         fontFamily: 'Manrope',
       ),
-      home: MessageListPage(),
+      home: ForgotPasswordPage(),
       debugShowCheckedModeBanner: false,
     );
   }

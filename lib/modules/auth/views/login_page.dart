@@ -1,6 +1,6 @@
 import 'package:buzz_hub/core/values/app_colors.dart';
-import 'package:buzz_hub/modules/login/controller/login_controller.dart';
-import 'package:buzz_hub/modules/login/views/conversation_page.dart';
+import 'package:buzz_hub/modules/auth/controller/login_controller.dart';
+import 'package:buzz_hub/modules/auth/views/conversation_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';

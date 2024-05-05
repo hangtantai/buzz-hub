@@ -1,5 +1,5 @@
 import 'package:buzz_hub/core/values/app_colors.dart';
-import 'package:buzz_hub/modules/login/controller/conversation_controller.dart';
+import 'package:buzz_hub/modules/auth/controller/conversation_controller.dart';
 import 'package:buzz_hub/services/dto/responses/conversation_response.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
