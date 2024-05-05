@@ -55,10 +55,34 @@ class ConversationPage extends StatelessWidget {
       ),
       body: Column(
         children: [
-          Row(),
-          SizedBox(
-            height: 100,
-          ),
+          Container(
+              width: double.infinity,
+              padding: EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Bạn bè',
+                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+                  ),
+                  SizedBox(
+                    height: 16,
+                  ),
+                  Container(
+                    width: double.infinity,
+                    height: 120,
+                    child: ListView.separated(
+                      shrinkWrap: true,
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (context, index) {
+                        return friendItem();
+                      },
+                      itemCount: 6,
+                      separatorBuilder: (context, index) => SizedBox(width: 12),
+                    ),
+                  )
+                ],
+              )),
           Expanded(
             child: Container(
               width: Get.width,
@@ -77,6 +101,31 @@ class ConversationPage extends StatelessWidget {
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(30), color: Colors.white),
             ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget friendItem() {
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12), color: Colors.white),
+      child: Column(
+        children: [
+          CircleAvatar(
+            radius: 30,
+            backgroundImage: NetworkImage(
+                'https://images.fpt.shop/unsafe/filters:quality(5)/fptshop.com.vn/uploads/images/tin-tuc/158160/Originals/2%20(7).jpg'),
+          ),
+          SizedBox(
+            height: 8,
+          ),
+          Text(
+            'Jane',
+            style:
+                TextStyle(fontWeight: FontWeight.w400, color: AppColors.DarkBg),
           )
         ],
       ),
