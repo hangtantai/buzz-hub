@@ -1,15 +1,12 @@
 import 'dart:io';
-import 'package:buzz_hub/modules/login/views/conversation_page.dart';
-import 'package:buzz_hub/modules/login/views/login_page.dart';
-import 'package:buzz_hub/modules/login/views/register_page.dart';
-import 'package:buzz_hub/services/auth_service.dart';
-import 'package:buzz_hub/services/dto/requests/login_request.dart';
+import 'package:buzz_hub/modules/auth/views/forgot_password_page.dart';
+import 'package:buzz_hub/modules/message/views/message_list_page.dart';
+import 'package:buzz_hub/modules/root_view/view/root_view_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 void main(List<String> arguments) async {
   HttpOverrides.global = MyHttpOverrides();
- 
 
   runApp(const MyApp());
 }
@@ -25,7 +22,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         fontFamily: 'Manrope',
       ),
-      home: LoginPage(),
+      home: RootViewScreen(),
       debugShowCheckedModeBanner: false,
     );
   }
