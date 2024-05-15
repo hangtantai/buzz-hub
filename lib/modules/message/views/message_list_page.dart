@@ -2,6 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:buzz_hub/core/values/app_colors.dart';
+import 'package:buzz_hub/modules/auth/views/login_page.dart';
+import 'package:buzz_hub/services/conversation_service.dart';
+import 'package:buzz_hub/services/dto/responses/conversation_response.dart';
+import 'package:buzz_hub/services/dto/responses/current_user_response.dart';
+import 'package:buzz_hub/services/dto/responses/message_response.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +14,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mime/mime.dart';
 import 'package:open_filex/open_filex.dart';
@@ -17,7 +23,8 @@ import 'package:uuid/uuid.dart';
 import 'package:http/http.dart' as http;
 
 class MessageListPage extends StatefulWidget {
-  const MessageListPage({super.key});
+  const MessageListPage({super.key, required this.conversation});
+  final ConversationResponse conversation;
 
   @override
   State<MessageListPage> createState() => _MessageListPageState();
@@ -25,9 +32,11 @@ class MessageListPage extends StatefulWidget {
 
 class _MessageListPageState extends State<MessageListPage> {
   List<types.Message> _messages = [];
-  final _user = const types.User(
-    id: '82091008-a484-4a89-ae75-a22bf8d6f3ac',
-  );
+  final _user = types.User(
+      id: LoginPage.currentUser!.userName!,
+      imageUrl:
+          'https://goexjtmckylmpnrbxtcn.supabase.co/storage/v1/object/public/users-avatar/' +
+              LoginPage.currentUser!.avatarUrl!);
 
   @override
   void initState() {
@@ -201,13 +210,13 @@ class _MessageListPageState extends State<MessageListPage> {
   }
 
   void _loadMessages() async {
-    final response = await rootBundle.loadString('assets/messages.json');
-    final messages = (jsonDecode(response) as List)
-        .map((e) => types.Message.fromJson(e as Map<String, dynamic>))
-        .toList();
+    // final response = await rootBundle.loadString('assets/messages.json');
+    ConversationService service = ConversationService();
+    final messages =
+        await service.getMessagesFromAConversation(widget.conversation);
 
     setState(() {
-      _messages = messages;
+      _messages = convertMessageToWidget(messages!);
     });
   }
 
@@ -217,6 +226,7 @@ class _MessageListPageState extends State<MessageListPage> {
           surfaceTintColor: Colors.transparent,
           backgroundColor: Colors.white,
           leading: InkWell(
+            onTap: () => Get.back(),
             child: Icon(Icons.arrow_back),
           ),
           titleSpacing: 0,
@@ -224,14 +234,15 @@ class _MessageListPageState extends State<MessageListPage> {
             children: [
               CircleAvatar(
                 backgroundImage: NetworkImage(
-                    'https://images.fpt.shop/unsafe/filters:quality(5)/fptshop.com.vn/uploads/images/tin-tuc/158160/Originals/2%20(7).jpg'),
+                    'https://goexjtmckylmpnrbxtcn.supabase.co/storage/v1/object/public/users-avatar/' +
+                        widget.conversation.conversationAvatar),
               ),
               SizedBox(
                 width: 8,
               ),
               Expanded(
                 child: Text(
-                  'John Adisa',
+                  widget.conversation.conversationName,
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
               ),
@@ -272,4 +283,23 @@ class _MessageListPageState extends State<MessageListPage> {
           ),
         ),
       );
+}
+
+List<types.Message> convertMessageToWidget(List<MessageResponse> messageList) {
+  List<types.Message> widgets = [];
+
+  for (MessageResponse message in messageList) {
+    final textMessageUI = types.TextMessage(
+      author: types.User(
+          id: message.senderId!,
+          imageUrl:
+              'https://goexjtmckylmpnrbxtcn.supabase.co/storage/v1/object/public/users-avatar/' +
+                  message.senderAvatar!),
+      createdAt: 1,
+      id: const Uuid().v4(),
+      text: message.content!,
+    );
+    widgets.insert(0, textMessageUI);
+  }
+  return widgets;
 }
