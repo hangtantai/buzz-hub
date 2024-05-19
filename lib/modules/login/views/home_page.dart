@@ -103,7 +103,7 @@ class PostWidget extends StatefulWidget {
 }
 
 class _PostWidgetState extends State<PostWidget> {
-  bool isLiked = false;
+  bool isLiked = false, isBookmarked = false;
   int likeCount = 0;
   int cmtCount = 0;
   int shareCount = 0;
@@ -245,8 +245,13 @@ class _PostWidgetState extends State<PostWidget> {
               IconButton(
                 onPressed: () {
                   //Handle bookmark action
+                  setState(() {
+                    isBookmarked = !isBookmarked;        
+                  });
                 }, 
-                icon: const Icon(Icons.bookmark)
+                icon: Icon(
+                  isBookmarked ? Icons.bookmark : Icons.bookmark_border_outlined,
+                ),
               ),
             ],
           ),

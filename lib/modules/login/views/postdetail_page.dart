@@ -23,12 +23,14 @@ class PostDetailPage extends StatelessWidget {
     {
       "avtPath": "lib/pics/avt.jpg",
       "commentator": "Pirate",
-      "cmtContent": "Em dep lam!"
+      "cmtContent": "Em dep lam!",
+      "isReply:": "false"
     },
     {
       "avtPath": "lib/pics/avt1.jpg",
       "commentator": "Jolie",
-      "cmtContent": "Gyatt !!"
+      "cmtContent": "Gyatt !!",
+      "isReply:": "true"
     },
     // Add more sample comments if needed
   ];
@@ -63,6 +65,7 @@ class PostDetailPage extends StatelessWidget {
                 avtPath: comment['avtPath']!,
                 commentator: comment['commentator']!,
                 cmtContent: comment['cmtContent']!,
+                isReply: comment['isReply'] == 'true',
             ),            
           ],
         ),
@@ -76,12 +79,14 @@ class CommentWidget extends StatelessWidget {
   final String avtPath;
   final String commentator;
   final String cmtContent;
+  final bool isReply;
 
   const CommentWidget({
     Key? key,
     required this.avtPath,
     required this.commentator,
     required this.cmtContent,
+    required this.isReply,
   }) : super(key: key);
 
   @override
@@ -288,7 +293,7 @@ class PostWidget extends StatefulWidget {
 }
 
 class _PostWidgetState extends State<PostWidget> {
-  bool isLiked = false;
+  bool isLiked = false, isBookmarked = false;
   int likeCount = 0;
   int cmtCount = 0;
   int shareCount = 0;
@@ -416,9 +421,14 @@ class _PostWidgetState extends State<PostWidget> {
               ),
               IconButton(
                 onPressed: () {
-                  // Handle bookmark action
-                },
-                icon: const Icon(Icons.bookmark),
+                  //Handle bookmark action
+                  setState(() {
+                    isBookmarked = !isBookmarked;        
+                  });
+                }, 
+                icon: Icon(
+                  isBookmarked ? Icons.bookmark : Icons.bookmark_border_outlined,
+                ),
               ),
             ],
           ),
