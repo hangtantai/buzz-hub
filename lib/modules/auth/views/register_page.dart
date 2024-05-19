@@ -1,5 +1,5 @@
 import 'package:buzz_hub/core/values/app_colors.dart';
-import 'package:buzz_hub/modules/login/controller/register_controller.dart';
+import 'package:buzz_hub/modules/auth/controller/register_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
