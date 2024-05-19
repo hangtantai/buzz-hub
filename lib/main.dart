@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:buzz_hub/modules/auth/views/forgot_password_page.dart';
+import 'package:buzz_hub/modules/auth/views/login_page.dart';
 import 'package:buzz_hub/modules/message/views/message_list_page.dart';
 import 'package:buzz_hub/modules/root_view/view/root_view_screen.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +23,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         fontFamily: 'Manrope',
       ),
-      home: RootViewScreen(),
+      home: LoginPage(),
       debugShowCheckedModeBanner: false,
     );
   }
