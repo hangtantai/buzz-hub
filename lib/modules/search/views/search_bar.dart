@@ -16,6 +16,7 @@ class _MySearchBarAppState extends State<MySearchBarApp> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: SizedBox(),
         title: Row(
           children: [
             GestureDetector(
