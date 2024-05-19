@@ -1,4 +1,9 @@
 import 'package:buzz_hub/core/values/app_colors.dart';
+import 'package:buzz_hub/modules/auth/views/home_page.dart';
+import 'package:buzz_hub/modules/auth/views/login_page.dart';
+import 'package:buzz_hub/modules/auth/views/postdetail_page.dart';
+import 'package:buzz_hub/services/dto/responses/post_response.dart';
+import 'package:buzz_hub/widgets/post_item.dart';
 import 'package:flutter/material.dart';
 import 'package:buzz_hub/modules/post/models/post_model.dart';
 import 'package:get/get.dart';
@@ -167,6 +172,13 @@ class _CreateBookmarks extends State<BookMarks> {
 
   @override
   Widget build(BuildContext context) {
+    PostResponse postResponse = PostResponse(
+        postId: "1",
+        textContent:
+            "It is a long established fact that a reader will bee distracted by the readable content ... 100000000000000000000000000000000000000000000000000000000",
+        imageContent: [LoginPage.currentUser!.avatarUrl!],
+        author: LoginPage.currentUser,
+        createdAt: DateTime.now());
     return Scaffold(
         appBar: AppBar(
             title: Text('Bookmarks',
@@ -183,13 +195,14 @@ class _CreateBookmarks extends State<BookMarks> {
               ),
             )),
         backgroundColor: Colors.white,
-        body: ListView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          children: <Widget>[
-            _builtPost(0),
-            const SizedBox(height: 10),
-            _builtPost(1),
-          ],
+        body: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: ListView.builder(
+            itemBuilder: (context, index) {
+              return PostItem(post: postResponse);
+            },
+            itemCount: 2,
+          ),
         ));
   }
 }
