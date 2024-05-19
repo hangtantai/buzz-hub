@@ -12,6 +12,7 @@ class AppColors {
   static const Grey3 = Color(0xFFF3F6F6);
   static const DarkBg = Color(0xFF171719);
   static const DarkBg2 = Color(0xFF1C1D1D);
+
   static const PrimaryGradient = [
     Pink,
     Purple,
