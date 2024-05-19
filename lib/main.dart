@@ -7,10 +7,13 @@ import 'package:buzz_hub/services/dto/requests/login_request.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import 'package:buzz_hub/modules/post/views/create_post_page.dart';
+import 'package:buzz_hub/modules/bookmarks/views/bookmarks_screen.dart';
+import 'package:buzz_hub/modules/bookmarks/views/bookmarks_null.dart';
+
 void main(List<String> arguments) async {
   HttpOverrides.global = MyHttpOverrides();
  
-
   runApp(const MyApp());
 }
 
@@ -25,7 +28,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         fontFamily: 'Manrope',
       ),
-      home: LoginPage(),
+      home: const BookMarks(),
       debugShowCheckedModeBanner: false,
     );
   }
@@ -39,3 +42,5 @@ class MyHttpOverrides extends HttpOverrides {
           (X509Certificate cert, String host, int port) => true;
   }
 }
+
+
