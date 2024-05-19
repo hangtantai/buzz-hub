@@ -1,3 +1,4 @@
+import 'package:buzz_hub/modules/auth/views/home_page.dart';
 import 'package:buzz_hub/modules/conversation/view/conversation_page.dart';
 import 'package:buzz_hub/modules/profile/views/profile.dart';
 import 'package:buzz_hub/modules/search/views/search_bar.dart';
@@ -12,7 +13,7 @@ class RootViewController extends GetxController {
   final text = TextEditingController();
 
   final screens = <Widget>[
-    SizedBox(), //home page
+    HomePage(), //home page
     MySearchBarApp(), //search page
     ConversationPage(),
     ProfileScreen(), //account page
