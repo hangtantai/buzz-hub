@@ -1,4 +1,8 @@
 import 'dart:io';
+import 'package:buzz_hub/modules/search/views/search_bar.dart';
+import 'package:buzz_hub/services/auth_service.dart';
+import 'package:buzz_hub/services/dto/requests/login_request.dart';
+import 'package:buzz_hub/modules/search/views/search_bar.dart' as BuzzHubSearchBar;
 import 'package:buzz_hub/modules/auth/views/forgot_password_page.dart';
 import 'package:buzz_hub/modules/auth/views/login_page.dart';
 import 'package:buzz_hub/modules/message/views/message_list_page.dart';
