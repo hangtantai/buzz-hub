@@ -1,4 +1,6 @@
 import 'package:buzz_hub/modules/conversation/view/conversation_page.dart';
+import 'package:buzz_hub/modules/profile/views/profile.dart';
+import 'package:buzz_hub/modules/search/views/search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -11,9 +13,9 @@ class RootViewController extends GetxController {
 
   final screens = <Widget>[
     SizedBox(), //home page
-    SizedBox(), //search page
+    MySearchBarApp(), //search page
     ConversationPage(),
-    SizedBox(), //account page
+    ProfileScreen(), //account page
   ];
 
   @override
