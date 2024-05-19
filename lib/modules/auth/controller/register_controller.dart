@@ -1,5 +1,5 @@
 import 'package:buzz_hub/services/auth_service.dart';
-import 'package:buzz_hub/services/dto/register_request.dart';
+import 'package:buzz_hub/services/dto/requests/register_request.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
