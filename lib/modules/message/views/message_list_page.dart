@@ -1,8 +1,12 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:buzz_hub/core/values/app_colors.dart';
+import 'package:buzz_hub/core/values/constant.dart';
+import 'package:buzz_hub/modules/auth/controller/login_controller.dart';
 import 'package:buzz_hub/modules/auth/views/login_page.dart';
+import 'package:buzz_hub/modules/root_view/controller/root_view_controller.dart';
 import 'package:buzz_hub/services/conversation_service.dart';
 import 'package:buzz_hub/services/dto/responses/conversation_response.dart';
 import 'package:buzz_hub/services/dto/responses/current_user_response.dart';
@@ -19,6 +23,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mime/mime.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:signalr_core/signalr_core.dart';
 import 'package:uuid/uuid.dart';
 import 'package:http/http.dart' as http;
 
@@ -38,10 +44,54 @@ class _MessageListPageState extends State<MessageListPage> {
           'https://goexjtmckylmpnrbxtcn.supabase.co/storage/v1/object/public/users-avatar/' +
               LoginPage.currentUser!.avatarUrl!);
 
+  List<StreamSubscription> subscriptions = [];
+  ConversationService service = ConversationService();
+
   @override
   void initState() {
     super.initState();
     _loadMessages();
+    subscriptions.addAll([
+      LoginController.messageReceivedStreamCtrl.stream.listen((message) {
+        if (message.messageType == "text") {
+          final textMessage = types.TextMessage(
+            author: types.User(
+                id: message.senderId!,
+                imageUrl:
+                    'https://goexjtmckylmpnrbxtcn.supabase.co/storage/v1/object/public/users-avatar/user-ronaldo'),
+            createdAt: 1,
+            id: const Uuid().v4(),
+            text: message.content!,
+          );
+          _addMessage(textMessage);
+        } else if (message.messageType == "image") {
+          final image = Image.network(message.content!);
+
+          final imageMessage = types.ImageMessage(
+            author: types.User(
+                id: message.senderId!,
+                imageUrl:
+                    'https://goexjtmckylmpnrbxtcn.supabase.co/storage/v1/object/public/users-avatar/user-ronaldo'),
+            createdAt: 1,
+            id: const Uuid().v4(),
+            height: image.height,
+            name: '',
+            size: 1000,
+            uri: message.content!,
+            width: image.width,
+          );
+          _addMessage(imageMessage);
+        }
+      }),
+    ]);
+  }
+
+  @override
+  void dispose() {
+    for (var e in subscriptions) {
+      e.cancel();
+    }
+    super.dispose();
   }
 
   void _addMessage(types.Message message) {
@@ -135,6 +185,12 @@ class _MessageListPageState extends State<MessageListPage> {
         width: image.width.toDouble(),
       );
 
+      service.sendFileMessage(
+        conversationId: widget.conversation.conversationId,
+        messageType: 'image',
+        xfile: result,
+      );
+
       _addMessage(message);
     }
   }
@@ -198,7 +254,7 @@ class _MessageListPageState extends State<MessageListPage> {
     });
   }
 
-  void _handleSendPressed(types.PartialText message) {
+  void _handleSendPressed(types.PartialText message) async {
     final textMessage = types.TextMessage(
       author: _user,
       createdAt: DateTime.now().millisecondsSinceEpoch,
@@ -206,12 +262,14 @@ class _MessageListPageState extends State<MessageListPage> {
       text: message.text,
     );
 
+    await LoginController.connection!.invoke('SendPeerMessage',
+        args: [widget.conversation.conversationId, "text", message.text]);
+
     _addMessage(textMessage);
   }
 
   void _loadMessages() async {
     // final response = await rootBundle.loadString('assets/messages.json');
-    ConversationService service = ConversationService();
     final messages =
         await service.getMessagesFromAConversation(widget.conversation);
 
@@ -289,17 +347,35 @@ List<types.Message> convertMessageToWidget(List<MessageResponse> messageList) {
   List<types.Message> widgets = [];
 
   for (MessageResponse message in messageList) {
-    final textMessageUI = types.TextMessage(
-      author: types.User(
-          id: message.senderId!,
-          imageUrl:
-              'https://goexjtmckylmpnrbxtcn.supabase.co/storage/v1/object/public/users-avatar/' +
-                  message.senderAvatar!),
-      createdAt: 1,
-      id: const Uuid().v4(),
-      text: message.content!,
-    );
-    widgets.insert(0, textMessageUI);
+    if (message.messageType == "text") {
+      final textMessageUI = types.TextMessage(
+        author: types.User(
+            id: message.senderId!,
+            imageUrl:
+                'https://goexjtmckylmpnrbxtcn.supabase.co/storage/v1/object/public/users-avatar/user-ronaldo'),
+        createdAt: 1,
+        id: const Uuid().v4(),
+        text: message.content!,
+      );
+      widgets.insert(0, textMessageUI);
+    } else if (message.messageType == "image") {
+      final image = Image.network(message.content!);
+
+      final messageImageUI = types.ImageMessage(
+        author: types.User(
+            id: message.senderId!,
+            imageUrl:
+                'https://goexjtmckylmpnrbxtcn.supabase.co/storage/v1/object/public/users-avatar/user-ronaldo'),
+        createdAt: 1,
+        id: const Uuid().v4(),
+        height: image.height,
+        name: '',
+        size: 1000,
+        uri: message.content!,
+        width: image.width,
+      );
+      widgets.insert(0, messageImageUI);
+    }
   }
   return widgets;
 }

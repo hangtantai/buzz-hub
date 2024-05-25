@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:buzz_hub/core/values/constant.dart';
 import 'package:buzz_hub/services/base_response.dart';
 import 'package:buzz_hub/services/dto/responses/conversation_response.dart';
 import 'package:buzz_hub/services/dto/responses/message_response.dart';
 import 'package:dio/dio.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ConversationService {
@@ -59,6 +62,36 @@ class ConversationService {
         return messages;
       });
       return res;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<void> sendFileMessage({
+    required String conversationId,
+    required String messageType,
+    required XFile xfile,
+  }) async {
+    try {
+      var url =
+          '${Constants.BASE_URL}/$endpoint/Peer/$conversationId/Messages/$messageType';
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final String? accessToken = prefs.getString(Constants.ACCESS_TOKEN);
+      print(url);
+
+      File file = File(xfile.path);
+      String fileName = file.path.split('/').last;
+      FormData formData = FormData.fromMap({
+        "file": await MultipartFile.fromFile(file.path, filename: fileName),
+      });
+
+      Response response = await Dio().post(url,
+          data: formData,
+          options: Options(headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $accessToken",
+          }));
+      return;
     } catch (e) {
       return null;
     }
