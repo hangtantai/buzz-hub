@@ -14,7 +14,7 @@ class MessageResponse {
   final String? groupId;
   final String? senderName;
   final String? senderAvatar;
-  final List<ReactionResponse>? reactions;
+  // final List<ReactionResponse>? reactions;
   
 
   MessageResponse({
@@ -25,7 +25,7 @@ class MessageResponse {
     this.groupId,
     this.senderName,
     this.senderAvatar,
-    this.reactions,
+    // this.reactions,
   });
 
   factory MessageResponse.fromJson(Map<String, dynamic> json) =>
