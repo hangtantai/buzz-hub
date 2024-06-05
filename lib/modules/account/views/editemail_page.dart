@@ -1,38 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:settings_ui/settings_ui.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:buzz_hub/core/values/app_colors.dart';
-import 'accountdetails_page.dart';
+import 'package:buzz_hub/modules/account/controller/editemail_controller.dart';
+import 'package:buzz_hub/modules/account/controller/accountdetail_controller.dart';
+import 'package:get/get.dart';
 
-class EditUsernamePage extends StatefulWidget {
+class EditEmailPage extends StatefulWidget {
   @override
-  _EditUsernamePageState createState() => _EditUsernamePageState();
+  _EditEmailPageState createState() => _EditEmailPageState();
 }
 
-class _EditUsernamePageState extends State<EditUsernamePage> {
-  final TextEditingController _usernameController = TextEditingController();
-
-  @override
-  void dispose() {
-    _usernameController.dispose();
-    super.dispose();
-  }
+class _EditEmailPageState extends State<EditEmailPage> {
+  final EditEmailController controller = Get.put(EditEmailController());
+  final AccountDetailController accountDetailController = Get.find<AccountDetailController>();
 
   @override
   Widget build(BuildContext context) {
-    const containerHeight = 60.0;
-    const containerPadding = EdgeInsets.symmetric(horizontal: 12.0, vertical: 19.0);
-    
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text(
-          'Thay đổi tên người dùng',
+        title: Text(
+          'Email',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
           } ,
@@ -45,20 +38,20 @@ class _EditUsernamePageState extends State<EditUsernamePage> {
           children: [
             const SizedBox(height: 20),
             const Icon(
-              Iconsax.user_edit,
+              Iconsax.sms,
               size: 80,
               color: Color.fromARGB(255, 0, 0, 0),
             ),
             const SizedBox(height: 10),
             const Text(
-              'Bạn có thể thay đổi tên người dùng một lần trong một tháng.',
+              'Email của bạn đã được liên kết với tài khoản. Bạn có thể thay đổi email dưới đây.',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 30),
+            SizedBox(height: 30),
             Container(
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -68,17 +61,17 @@ class _EditUsernamePageState extends State<EditUsernamePage> {
                 ),
                 border: Border.all(color: Colors.grey.shade200),
               ),
-              child: const Padding(
-                padding: containerPadding,
+              child:  Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 19.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Old',
+                      'Email hiện tại',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),                    
                     Text(
-                      '@'+AutofillHints.username,
+                      accountDetailController.currentUser.value!.email ?? 'Không có email',
                       style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
                     ),
                   ],
@@ -99,20 +92,18 @@ class _EditUsernamePageState extends State<EditUsernamePage> {
                 child: Row(
                   children: [
                     const Text(
-                      'New',
+                      'Email mới',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     SizedBox(width: 8),
                     Expanded(
                       child: Row(
                         children: [
-                          Text('@'),
                           Expanded(
                             child: TextField(
-                              controller: _usernameController,
+                              controller: controller.emailController,
                               decoration: const InputDecoration(
                                 border: InputBorder.none,
-                                //contentPadding: EdgeInsets.symmetric(horizontal: 4),
                                 contentPadding: EdgeInsets.zero,
                                 floatingLabelBehavior: FloatingLabelBehavior.never,
                               ),                              
@@ -128,26 +119,57 @@ class _EditUsernamePageState extends State<EditUsernamePage> {
             ),
             SizedBox(height: 30),
             
-            InkWell(
-              onTap: () async {
-                                  
-              },
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
+            Obx(
+              () => InkWell(
+                onTap: controller.isLoading.value
+                    ? null 
+                    : () async {
+                        final success = await controller.updateEmail(
+                          controller.emailController.text);
+                          if (success) {                            
+                            Get.snackbar(
+                              'Thông báo',
+                              'Cập nhật email thành công.',
+                              snackPosition: SnackPosition.BOTTOM,
+                              backgroundColor: Colors.green,
+                              colorText: Colors.white,  
+                            );
+                            Get.find<AccountDetailController>().fetchCurrentUser();
+                            Navigator.pop(context);
+                          }
+                        },                                            
+                
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
-                    color: AppColors.Purple),
-                child: const Text(
-                  'Lưu thay đổi',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16),
+                    color: controller.isLoading.value ? Colors.grey : AppColors.Purple, 
+                  ),
+                  child: Center( 
+                    child: controller.isLoading.value
+                        ? const CircularProgressIndicator(color: Colors.white) 
+                        : const Text(
+                            'Lưu thay đổi',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                            ),
+                          ),
+                  ),
                 ),
               ),
-            )
+            ),
+            Obx(
+              () => Visibility( 
+                visible: controller.errorMessage.isNotEmpty,
+                child: Text(
+                  controller.errorMessage.value,
+                  style: const TextStyle(color: Colors.red),
+                ),
+              ),
+            ),
           ],
         ),
       ),

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:settings_ui/settings_ui.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:buzz_hub/core/values/app_colors.dart';
-import 'accountdetails_page.dart';
+import 'package:buzz_hub/modules/account/controller/editbirthday_controller.dart';
+import 'package:buzz_hub/modules/account/controller/accountdetail_controller.dart';
+import 'package:get/get.dart';
 
 class EditBirthdayPage extends StatefulWidget {
   @override
@@ -12,22 +13,26 @@ class EditBirthdayPage extends StatefulWidget {
 }
 
 class _EditBirthdayPageState extends State<EditBirthdayPage> {
-  //final TextEditingController _usernameController = TextEditingController();
+
+  final EditBirthdayController controller = Get.put(EditBirthdayController());
+  final AccountDetailController accountDetailController = Get.find<AccountDetailController>();
+
   DateFormat dateFormat = DateFormat("dd MMM, yyyy");
-  DateTime dateOfBirth = DateTime(1990, 7, 23);
+  
+  late DateTime dateOfBirth;
 
   @override
-  void dispose() {
-    //_usernameController.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    dateOfBirth = accountDetailController.currentUser.value?.dob ?? DateTime(1990, 1, 1);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+      return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text(
+        title: const Text( 
           'Ngày sinh',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
@@ -87,6 +92,7 @@ class _EditBirthdayPageState extends State<EditBirthdayPage> {
                   context: context,
                   firstDate: DateTime(1900), 
                   lastDate: DateTime.now(),
+                  initialDate: dateOfBirth,
                 );
                 if (pickedDate != null && pickedDate != dateOfBirth) {
                   setState(() {
@@ -120,26 +126,77 @@ class _EditBirthdayPageState extends State<EditBirthdayPage> {
 
             const SizedBox(height: 30),
             
-            InkWell(
-              onTap: () async {
+            // InkWell(
+            //   onTap: () async {
                                   
-              },
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
+            //   },
+            //   child: Container(
+            //     width: double.infinity,
+            //     padding: const EdgeInsets.all(20),
+            //     decoration: BoxDecoration(
+            //         borderRadius: BorderRadius.circular(12),
+            //         color: AppColors.Purple),
+            //     child: const Text(
+            //       'Lưu thay đổi',
+            //       textAlign: TextAlign.center,
+            //       style: TextStyle(
+            //           color: Colors.white,
+            //           fontWeight: FontWeight.w600,
+            //           fontSize: 16),
+            //     ),
+            //   ),
+            // )
+            Obx(
+              () => InkWell(
+                onTap: controller.isLoading.value
+                    ? null 
+                    : () async {
+                        final success = await controller.updateBirthday(
+                          dateOfBirth);
+                          if (success) {                            
+                            Get.snackbar(
+                              'Thông báo',
+                              'Cập nhật ngày sinh thành công.',
+                              snackPosition: SnackPosition.BOTTOM,
+                              backgroundColor: Colors.green,
+                              colorText: Colors.white,  
+                            );
+                            Get.find<AccountDetailController>().fetchCurrentUser();
+                            Navigator.pop(context);
+                          }
+                        },                                            
+                
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
-                    color: AppColors.Purple),
-                child: const Text(
-                  'Lưu thay đổi',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16),
+                    color: controller.isLoading.value ? Colors.grey : AppColors.Purple, 
+                  ),
+                  child: Center( 
+                    child: controller.isLoading.value
+                        ? const CircularProgressIndicator(color: Colors.white) 
+                        : const Text(
+                            'Lưu thay đổi',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                            ),
+                          ),
+                  ),
                 ),
               ),
-            )
+            ),
+            Obx(
+              () => Visibility( 
+                visible: controller.errorMessage.isNotEmpty,
+                child: Text(
+                  controller.errorMessage.value,
+                  style: const TextStyle(color: Colors.red),
+                ),
+              ),
+            ),
           ],
         ),
       ),

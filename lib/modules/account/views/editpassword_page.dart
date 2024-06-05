@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:settings_ui/settings_ui.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:buzz_hub/core/values/app_colors.dart';
-import 'accountdetails_page.dart';
 
 class EditPasswordPage extends StatefulWidget {
   @override
@@ -17,14 +15,6 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
 
   final String currentPassword = "password";
   String _errorMessage = "";
-
-  @override
-  void dispose() {
-    _currentPasswordController.dispose();
-    _newPasswordController.dispose();
-    _confirmPasswordController.dispose();
-    super.dispose();
-  }
 
   void _changePassword() {
     String currentPasswordInput = _currentPasswordController.text;
