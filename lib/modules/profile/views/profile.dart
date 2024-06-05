@@ -1,5 +1,6 @@
 import 'package:buzz_hub/modules/auth/views/login_page.dart';
 import 'package:buzz_hub/modules/bookmarks/views/bookmarks_screen.dart';
+import 'package:buzz_hub/modules/account/views/accountdetails_page.dart';
 import 'package:buzz_hub/services/dto/responses/post_response.dart';
 import 'package:buzz_hub/widgets/post_item.dart';
 import 'package:flutter/cupertino.dart';
@@ -33,6 +34,10 @@ class ProfileScreen extends StatelessWidget {
       imageContent: [LoginPage.currentUser!.avatarUrl!],
       author: LoginPage.currentUser,
       createdAt: DateTime.now());
+
+  void navigateToAccountDetailsPage() {
+    Get.to(AccountDetailsPage());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -136,6 +141,7 @@ class ProfileScreen extends StatelessWidget {
                         Spacer(),
                         TextButton(
                           onPressed: () {
+                            navigateToAccountDetailsPage();
                             // write function here
                           },
                           child: Text('Change Profile',
