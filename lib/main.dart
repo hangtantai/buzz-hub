@@ -33,6 +33,7 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Manrope',
       ),
       home: LoginPage(),
+      // home: CreatePost(),
       debugShowCheckedModeBanner: false,
     );
   }
