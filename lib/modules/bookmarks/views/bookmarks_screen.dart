@@ -181,13 +181,13 @@ class _CreateBookmarks extends State<BookMarks> {
         createdAt: DateTime.now());
     return Scaffold(
         appBar: AppBar(
-            title: Text('Bookmarks',
+            title: const Text('Bookmarks',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             leading: InkWell(
               onTap: () {
                 Get.back();
               },
-              child: Icon(
+              child: const Icon(
                 Icons.arrow_back,
                 color: Color.fromARGB(255, 216, 204, 208),
                 size: 30.0,
