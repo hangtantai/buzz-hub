@@ -41,9 +41,17 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
         appBar: AppBar(
-          leading: SizedBox(),
+          leading: IconButton(
+              icon: Icon(Icons.arrow_back), // Use the back arrow icon
+              onPressed: () {
+                // Handle the back button press (e.g., navigate back)
+                Navigator.of(context).pop();
+              },
+            ),
           title: Text("Trang cá nhân"),
           centerTitle: false,
           actions: [
@@ -138,8 +146,11 @@ class ProfileScreen extends StatelessWidget {
                             Text('Following'), // Replace with actual number
                           ],
                         ),
-                        Spacer(),
-                        TextButton(
+                        SizedBox(width: 10),
+                        SizedBox(
+                          width: screenWidth * 0.3 ,
+                          height: screenHeight * 0.07,
+                          child: ElevatedButton(
                           onPressed: () {
                             navigateToAccountDetailsPage();
                             // write function here
@@ -154,7 +165,23 @@ class ProfileScreen extends StatelessWidget {
                               side: BorderSide(color: Colors.grey, width: 2),
                             ),
                           ),
-                        )
+                          child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text('My',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 14,
+                                overflow: TextOverflow.ellipsis,
+                              )),
+                              Text('Friends',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 14,
+                                overflow: TextOverflow.ellipsis,
+                              ))
+                              ]),
+                        ))
                       ],
                     ),
                     SizedBox(width: 10), // Add some space
@@ -266,107 +293,138 @@ class CommentScreen extends StatelessWidget {
   }
 }
 
-// class Post extends StatelessWidget {
-//   final Controller c;
 
-//   Post({
-//     Key? key,
-//     required this.c,
-//   }) : super(key: key);
+class FriendRequest {
+  final AssetImage avatarUrl;
+  final String name;
+  final DateTime requestTime;
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return Column(children: <Widget>[
-//       DecoratedBox(
-//           decoration: BoxDecoration(
-//             border: Border.all(
-//               color: Colors.grey[200] ?? Colors.grey,
-//               width: 2,
-//             ),
-//             borderRadius: BorderRadius.circular(10),
-//           ),
-//           child: Container(
-//             padding: EdgeInsets.all(10),
-//             child: Column(
-//               children: <Widget>[
-//                 Row(
-//                   children: <Widget>[
-//                     CircleAvatar(
-//                       backgroundImage: AssetImage('assets/images/user.jpg'),
-//                       radius: 20,
-//                     ),
-//                     SizedBox(width: 10),
-//                     RichText(
-//                       text: TextSpan(
-//                         children: [
-//                           TextSpan(
-//                             text: 'You ',
-//                             style: TextStyle(color: Colors.black, fontSize: 16),
-//                           ),
-//                           WidgetSpan(
-//                             child: Icon(Icons.check_circle,
-//                                 color: Colors.blue, size: 16),
-//                           ),
-//                         ],
-//                       ),
-//                     ),
-//                     Spacer(),
-//                     Text(
-//                       'Posted 2h ago',
-//                       style: TextStyle(color: Colors.grey, fontSize: 12),
-//                     ),
-//                   ],
-//                 ),
-//                 SizedBox(height: 10),
-//                 Text(
-//                   'Post content goes here...',
-//                   style: TextStyle(color: Colors.black, fontSize: 16),
-//                 ),
-//                 SizedBox(height: 10),
-//                 Row(
-//                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                   children: <Widget>[
-//                     Row(
-//                       children: <Widget>[
-//                         Obx(
-//                           () => IconButton(
-//                             icon: Icon(
-//                               c.isFavorited.value
-//                                   ? Icons.favorite
-//                                   : Icons.favorite_border,
-//                               color: c.isFavorited.value ? Colors.pink : null,
-//                             ),
-//                             onPressed: c.toggleFavorite,
-//                           ),
-//                         ),
-//                         IconButton(
-//                           icon: Icon(Icons.comment),
-//                           onPressed: () {
-//                             // write function here
-//                             Get.to(CommentScreen());
-//                           },
-//                         ),
-//                         IconButton(
-//                           icon: Icon(Icons.share),
-//                           onPressed: () {
-//                             // write function here
-//                             Share.share('Check out this post',
-//                                 subject: 'Look what I found!');
-//                           },
-//                         ),
-//                       ],
-//                     ),
-//                     IconButton(
-//                       icon: Icon(Icons.bookmark_border),
-//                       onPressed: () {
-//                         c.savePost(context);
-//                       },
-//                     ),
-//                   ],
-//                 ),
-//               ],
-//             ),
-//           )),
-//     ]);
-//   }
-// }
+  FriendRequest({
+    required this.avatarUrl,
+    required this.name,
+    required this.requestTime,
+  });
+}
+
+class FriendPage extends StatefulWidget {
+  const FriendPage({Key? key}) : super(key: key);
+
+  @override
+  State<FriendPage> createState() => _FriendPageState();
+}
+
+class _FriendPageState extends State<FriendPage> {
+  final List<FriendRequest> friends = [
+    FriendRequest(
+      avatarUrl: const AssetImage('assets/images/user.jpg'),
+      name: 'Alice Johnson',
+      requestTime: DateTime.now().subtract(const Duration(minutes: 5)), // Example: 5 minutes ago
+    ),
+    FriendRequest(
+      avatarUrl: const AssetImage('assets/images/user.jpg'),
+      name: 'Bob Williams',
+      requestTime: DateTime.now().subtract(const Duration(hours: 2)), // Example: 2 hours ago
+    ),
+    // ... more friend requests
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Friend Requests'),
+      ),
+      body: ListView.builder(
+        itemCount: friends.length,
+        itemBuilder: (context, index) {
+          final friend = friends[index];
+
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 50,
+                  backgroundImage: friend.avatarUrl,
+                ),
+                const SizedBox(width: 20),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                        friend.name,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const Spacer(),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: Text(
+                          _formatTimeDifference(friend.requestTime),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                          )
+                        )
+                      )
+                      ]),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                // Handle accept button press for friend at index
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blue,
+                                minimumSize: const Size.fromHeight(40),
+                              ),
+                              child: const Text('Accept', style: TextStyle(color: Colors.white)),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                // Handle remove button press for friend at index
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.grey,
+                                minimumSize: const Size.fromHeight(40),
+                              ),
+                              child: const Text('Remove', style: TextStyle(color: Colors.white)),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  String _formatTimeDifference(DateTime requestTime) {
+    Duration difference = DateTime.now().difference(requestTime);
+    if (difference.inDays > 0) {
+      return '${difference.inDays}d ago';
+    } else if (difference.inHours > 0) {
+      return '${difference.inHours}h ago';
+    } else if (difference.inMinutes > 0) {
+      return '${difference.inMinutes}m ago';
+    } else {
+      return 'Just now';
+    }
+  }
+}
