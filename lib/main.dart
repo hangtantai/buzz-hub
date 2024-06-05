@@ -32,8 +32,8 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         fontFamily: 'Manrope',
       ),
-      home: AccountDetailsPage(),
-      //home: LoginPage(),
+      //home: AccountDetailsPage(),
+      home: LoginPage(),
       debugShowCheckedModeBanner: false,
     );
   }
