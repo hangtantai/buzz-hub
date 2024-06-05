@@ -1,5 +1,6 @@
 import 'package:buzz_hub/modules/auth/views/login_page.dart';
 import 'package:buzz_hub/modules/bookmarks/views/bookmarks_screen.dart';
+import 'package:buzz_hub/modules/account/views/accountdetails_page.dart';
 import 'package:buzz_hub/services/dto/responses/post_response.dart';
 import 'package:buzz_hub/widgets/post_item.dart';
 import 'package:flutter/cupertino.dart';
@@ -33,6 +34,10 @@ class ProfileScreen extends StatelessWidget {
       imageContent: [LoginPage.currentUser!.avatarUrl!],
       author: LoginPage.currentUser,
       createdAt: DateTime.now());
+
+  void navigateToAccountDetailsPage() {
+    Get.to(AccountDetailsPage());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -147,12 +152,14 @@ class ProfileScreen extends StatelessWidget {
                           height: screenHeight * 0.07,
                           child: ElevatedButton(
                           onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => FriendPage()),
-                              );
-                            },
-                          style: ElevatedButton.styleFrom(
+                            navigateToAccountDetailsPage();
+                            // write function here
+                          },
+                          child: Text('Change Profile',
+                              style: TextStyle(
+                                color: Colors.black,
+                              )),
+                          style: TextButton.styleFrom(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(999),
                               side: BorderSide(color: Colors.grey, width: 2),
