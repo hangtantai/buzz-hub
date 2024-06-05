@@ -1,20 +1,30 @@
 import 'package:buzz_hub/core/values/app_colors.dart';
+import 'package:buzz_hub/modules/auth/views/login_page.dart';
+import 'package:buzz_hub/modules/auth/views/postdetail_page.dart';
+import 'package:buzz_hub/services/post_service.dart';
+import 'package:buzz_hub/widgets/post_clone_item.dart';
+import 'package:buzz_hub/services/dto/responses/post_response.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
 
 class PostDetailPage extends StatelessWidget {
-  final String avtPath, postImg, postContent, author, time, myAvtPath, myName;
+  final PostResponse post;
+
+
+  // final String avtPath, postImg, postContent, author, time, myAvtPath, myName;
 
   PostDetailPage({
-    required this.avtPath,
-    required this.postImg,
-    required this.postContent,
-    required this.author,
-    required this.time,
-    required this.myAvtPath,
-    required this.myName,
+    // required this.avtPath,
+    // required this.postImg,
+    // required this.postContent,
+    // required this.author,
+    // required this.time,
+    // required this.myAvtPath,
+    // required this.myName,
+
+    required this.post
   });
 
   final List<Map<String, String>> comments = [
@@ -36,24 +46,22 @@ class PostDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: buildAppBar(context, author),
+      appBar: buildAppBar(context, post.author.toString()),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            PostWidget(
-              avtPath: avtPath,
-              postImg: postImg,
-              postContent: postContent,
-              author: author,
-              time: time,
-              myAvtPath: myAvtPath,
-              myName: myName,
-            ),
+            PostItem(post: PostResponse(
+              postId: "1",
+              textContent: "Test Content",
+              imageContent: [LoginPage.currentUser!.avatarUrl!],
+              author: LoginPage.currentUser!,
+              createdAt: DateTime.now()
+            )),
             Divider(),
             // Comment input cell
             CommentCell(
-              myAvt: myAvtPath,
-              myName: myName,
+              myAvt: LoginPage.currentUser!.avatarUrl!,
+              myName: LoginPage.currentUser!.userName!,
             ),
 
             Divider(),
@@ -138,7 +146,9 @@ class CommentCell extends StatelessWidget {
           // Avatar
           CircleAvatar(
             radius: 20, // Adjust the radius as needed
-            backgroundImage: AssetImage(myAvt),
+            backgroundImage: NetworkImage(
+              'https://goexjtmckylmpnrbxtcn.supabase.co/storage/v1/object/public/users-avatar/${LoginPage.currentUser!.avatarUrl!}'
+            ),
           ),
           const SizedBox(width: 8.0),
 
@@ -146,7 +156,7 @@ class CommentCell extends StatelessWidget {
           Expanded(
             child: TextField(
               decoration: InputDecoration(
-                hintText: 'Write a comment...',
+                hintText: 'Write a comment as ${myName}',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(20.0),
                   borderSide: BorderSide.none,
@@ -244,6 +254,8 @@ AppBar buildAppBar(BuildContext context, String author) {
 }
 
 
+
+// need call comment API
 class AvatarWidget extends StatelessWidget {
   final String imagePath;
   final double R;
@@ -260,178 +272,179 @@ class AvatarWidget extends StatelessWidget {
       padding: const EdgeInsets.only(right: 16.0), // Adjust this value as needed
       child: CircleAvatar(
         radius: R,
+        // change to network img and put 'link' + avtPath here 
         backgroundImage: AssetImage(imagePath),
       ),
     );
   }
 }
 
-class PostWidget extends StatefulWidget {
-  final String avtPath;
-  final String postImg;
-  final String postContent;
-  final String author;
-  final String time;
-  final String myAvtPath;
-  final String myName;
+// class PostWidget extends StatefulWidget {
+//   final String avtPath;
+//   final String postImg;
+//   final String postContent;
+//   final String author;
+//   final String time;
+//   final String myAvtPath;
+//   final String myName;
 
-  const PostWidget({
-    Key? key,
-    required this.avtPath,
-    required this.postImg,
-    required this.postContent,
-    required this.author,
-    required this.time,
-    required this.myAvtPath,
-    required this.myName,
-  }) : super(key: key);
+//   const PostWidget({
+//     Key? key,
+//     required this.avtPath,
+//     required this.postImg,
+//     required this.postContent,
+//     required this.author,
+//     required this.time,
+//     required this.myAvtPath,
+//     required this.myName,
+//   }) : super(key: key);
 
-  @override
-  _PostWidgetState createState() => _PostWidgetState();
-}
+//   @override
+//   _PostWidgetState createState() => _PostWidgetState();
+// }
 
-class _PostWidgetState extends State<PostWidget> {
-  bool isLiked = false, isBookmarked = false;
-  int likeCount = 0;
-  int cmtCount = 0;
-  int shareCount = 0;
+// class _PostWidgetState extends State<PostWidget> {
+//   bool isLiked = false, isBookmarked = false;
+//   int likeCount = 0;
+//   int cmtCount = 0;
+//   int shareCount = 0;
 
-  void navigateToPostDetailPage() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PostDetailPage(
-          avtPath: widget.avtPath,
-          postImg: widget.postImg,
-          postContent: widget.postContent,
-          author: widget.author,
-          time: widget.time,
-          myAvtPath: widget.myAvtPath,
-          myName: widget.myName,
-        ),
-      ),
-    );
-  }
+//   void navigateToPostDetailPage() {
+//     Navigator.push(
+//       context,
+//       MaterialPageRoute(
+//         builder: (context) => PostDetailPage(
+//           avtPath: widget.avtPath,
+//           postImg: widget.postImg,
+//           postContent: widget.postContent,
+//           author: widget.author,
+//           time: widget.time,
+//           myAvtPath: widget.myAvtPath,
+//           myName: widget.myName,
+//         ),
+//       ),
+//     );
+//   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Author
-        Padding(
-          padding: const EdgeInsets.only(top: 16, bottom: 10, left: 16),
-          child: Row(
-            children: [
-              AvatarWidget(
-                imagePath: widget.avtPath,
-                R: 18,
-              ),
-              const SizedBox(width: 6), // Add spacing between avatar and content
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.author, // Add the author's name or username here
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    widget.time, // Add the time of the post here
-                    style: const TextStyle(fontSize: 14, color: Colors.grey),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
+//   @override
+//   Widget build(BuildContext context) {
+//     return Column(
+//       crossAxisAlignment: CrossAxisAlignment.start,
+//       children: [
+//         // Author
+//         Padding(
+//           padding: const EdgeInsets.only(top: 16, bottom: 10, left: 16),
+//           child: Row(
+//             children: [
+//               AvatarWidget(
+//                 imagePath: widget.avtPath,
+//                 R: 18,
+//               ),
+//               const SizedBox(width: 6), // Add spacing between avatar and content
+//               Column(
+//                 crossAxisAlignment: CrossAxisAlignment.start,
+//                 children: [
+//                   Text(
+//                     widget.author, // Add the author's name or username here
+//                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+//                   ),
+//                   Text(
+//                     widget.time, // Add the time of the post here
+//                     style: const TextStyle(fontSize: 14, color: Colors.grey),
+//                   ),
+//                 ],
+//               ),
+//             ],
+//           ),
+//         ),
 
-        // Post Content
-        GestureDetector(
-          onTap: navigateToPostDetailPage,
-          child: Padding(
-            padding: const EdgeInsets.only(top: 0, bottom: 5, left: 16, right: 16),
-            child: Text(
-              widget.postContent,
-              style: const TextStyle(fontSize: 20),
-            ),
-          ),
-        ),
+//         // Post Content
+//         GestureDetector(
+//           onTap: navigateToPostDetailPage,
+//           child: Padding(
+//             padding: const EdgeInsets.only(top: 0, bottom: 5, left: 16, right: 16),
+//             child: Text(
+//               widget.postContent,
+//               style: const TextStyle(fontSize: 20),
+//             ),
+//           ),
+//         ),
 
-        // Post Image
-        GestureDetector(
-          onTap: navigateToPostDetailPage,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(25),
-              child: Image.asset(
-                widget.postImg,
-                fit: BoxFit.cover
-              ),
-            ),
-          ),
-        ),
+//         // Post Image
+//         GestureDetector(
+//           onTap: navigateToPostDetailPage,
+//           child: Padding(
+//             padding: const EdgeInsets.symmetric(horizontal: 16.0),
+//             child: ClipRRect(
+//               borderRadius: BorderRadius.circular(25),
+//               child: Image.asset(
+//                 widget.postImg,
+//                 fit: BoxFit.cover
+//               ),
+//             ),
+//           ),
+//         ),
 
-        // Post Actions (e.g., Comment, Share)
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  IconButton(
-                    onPressed: () {
-                      setState(() {
-                        isLiked = !isLiked;
-                        if (isLiked) {
-                          likeCount++;
-                        } else {
-                          likeCount--;
-                        }
-                      });
-                    },
-                    icon: Icon(
-                      isLiked ? Icons.favorite : Icons.favorite_border,
-                      color: isLiked ? Colors.pink : null,
-                    ),
-                  ),
-                  Text('$likeCount'), // Display the number of likes
-                  IconButton(
-                    onPressed: () {
-                      // Handle comment action
-                      navigateToPostDetailPage();
-                    },
-                    icon: const Icon(Icons.comment),
-                  ),
-                  Text('$cmtCount'), // Display the number of comments
-                  IconButton(
-                    onPressed: () {
-                      // Handle share action
-                      setState(() {
-                        shareCount++;
-                      });
-                    },
-                    icon: const Icon(Icons.share),
-                  ),
-                  Text('$shareCount'), // Display the number of shares
-                ],
-              ),
-              IconButton(
-                onPressed: () {
-                  //Handle bookmark action
-                  setState(() {
-                    isBookmarked = !isBookmarked;        
-                  });
-                }, 
-                icon: Icon(
-                  isBookmarked ? Icons.bookmark : Icons.bookmark_border_outlined,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
+//         // Post Actions (e.g., Comment, Share)
+//         Padding(
+//           padding: const EdgeInsets.symmetric(horizontal: 16.0),
+//           child: Row(
+//             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//             children: [
+//               Row(
+//                 children: [
+//                   IconButton(
+//                     onPressed: () {
+//                       setState(() {
+//                         isLiked = !isLiked;
+//                         if (isLiked) {
+//                           likeCount++;
+//                         } else {
+//                           likeCount--;
+//                         }
+//                       });
+//                     },
+//                     icon: Icon(
+//                       isLiked ? Icons.favorite : Icons.favorite_border,
+//                       color: isLiked ? Colors.pink : null,
+//                     ),
+//                   ),
+//                   Text('$likeCount'), // Display the number of likes
+//                   IconButton(
+//                     onPressed: () {
+//                       // Handle comment action
+//                       navigateToPostDetailPage();
+//                     },
+//                     icon: const Icon(Icons.comment),
+//                   ),
+//                   Text('$cmtCount'), // Display the number of comments
+//                   IconButton(
+//                     onPressed: () {
+//                       // Handle share action
+//                       setState(() {
+//                         shareCount++;
+//                       });
+//                     },
+//                     icon: const Icon(Icons.share),
+//                   ),
+//                   Text('$shareCount'), // Display the number of shares
+//                 ],
+//               ),
+//               IconButton(
+//                 onPressed: () {
+//                   //Handle bookmark action
+//                   setState(() {
+//                     isBookmarked = !isBookmarked;        
+//                   });
+//                 }, 
+//                 icon: Icon(
+//                   isBookmarked ? Icons.bookmark : Icons.bookmark_border_outlined,
+//                 ),
+//               ),
+//             ],
+//           ),
+//         ),
+//       ],
+//     );
+//   }
+// }
