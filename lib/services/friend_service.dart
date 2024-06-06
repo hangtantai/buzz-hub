@@ -7,6 +7,8 @@ import 'package:buzz_hub/services/dto/requests/register_request.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+
+
 class FriendService {
   static const endpoint = 'Friend';
   Future<List<CurrentUserResponse>?> getAllFriend() async {

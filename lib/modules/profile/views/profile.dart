@@ -8,7 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:share/share.dart';
-
+import 'package:buzz_hub/services/dto/responses/current_user_response.dart';
+import 'package:buzz_hub/core/values/constant.dart';
+import 'package:buzz_hub/modules/profile/views/list_friend_page.dart';
+import 'package:buzz_hub/services/friend_service.dart';
 class Controller extends GetxController {
   var isFavorited = false.obs;
   void toggleFavorite() {
@@ -25,8 +28,86 @@ class Controller extends GetxController {
   }
 }
 
+class FriendButton extends StatefulWidget {
+  const FriendButton({Key? key}) : super(key: key);
+
+  @override
+  State<FriendButton> createState() => _FriendButtonState();
+}
+
+class _FriendButtonState extends State<FriendButton> {
+  int _friendCount = 0;
+  final FriendService _friendService = FriendService();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchFriendCount();
+  }
+
+  Future<void> _fetchFriendCount() async {
+    final friends = await _friendService.getAllFriend();
+    setState(() {
+      _friendCount = friends?.length ?? 0;
+    });
+  }
+
+  Future<void> _navigateToFriendList() async {
+    final friends = await _friendService.getAllFriend();
+    if (friends != null) {
+      Get.to(() => FriendListPage(friends: friends));
+    } else {
+      Get.snackbar('Error', 'Failed to load friends');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: _navigateToFriendList,
+      style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.black,
+              padding: const EdgeInsets.symmetric(
+              horizontal: 16, vertical: 10),
+              textStyle: const TextStyle(fontSize: 16),
+            ),
+    child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+              Text('$_friendCount'),
+              Text('Friends'),
+            ],
+        ),
+      // child: Column(
+      //   mainAxisAlignment: MainAxisAlignment.center,
+      //   children: [
+      //     Text(
+      //       '$_friendCount',
+      //       style: const TextStyle(
+      //         fontSize: 20,
+      //         fontWeight: FontWeight.bold,
+      //         color: Colors.black,
+      //         backgroundColor: Colors.white,
+      //       ),
+      //     ),
+      //     const Text(
+      //       'Friends',
+      //       style: TextStyle(color: Colors.black),
+      //       ),
+      //   ],
+      // ),
+    );
+  }
+}
+
+
+
+
+
 class ProfileScreen extends StatelessWidget {
-  final Controller c = Get.put(Controller());
+  final CurrentUserResponse? user;
+  ProfileScreen({Key? key, this.user}) : super(key: key);
   PostResponse postResponse = PostResponse(
       postId: "1",
       textContent:
@@ -38,6 +119,14 @@ class ProfileScreen extends StatelessWidget {
   void navigateToAccountDetailsPage() {
     Get.to(AccountDetailsPage());
   }
+
+  ImageProvider getAvatarImage(CurrentUserResponse user) {
+      if (user.avatarUrl != 'string' && user.avatarUrl != '') {
+        return NetworkImage(Constants.HOST_AVATAR_URL + user.avatarUrl!);
+      } else {
+        return const AssetImage('assets/images/user.jpg');
+      }
+    }
 
   @override
   Widget build(BuildContext context) {
@@ -116,10 +205,12 @@ class ProfileScreen extends StatelessWidget {
                             child: CircleAvatar(
                               radius: 50,
                               backgroundImage:
-                                  AssetImage('assets/images/user.jpg'),
+                                  getAvatarImage(user!),
                             )),
-                        SizedBox(width: 10), // Add some space
-                        Column(
+                        SizedBox(width: 20), // Add some space
+                        Row(
+                        children: [
+                          Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             Text(
@@ -132,63 +223,38 @@ class ProfileScreen extends StatelessWidget {
                             Text('Follower'), // Replace with actual number
                           ],
                         ),
-                        SizedBox(width: 20), // Add some space
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              '450K',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text('Following'), // Replace with actual number
-                          ],
-                        ),
-                        SizedBox(width: 10),
-                        SizedBox(
-                            width: screenWidth * 0.3,
-                            height: screenHeight * 0.07,
-                            child: ElevatedButton(
+                        SizedBox(width: 10), // Add some space
+                        Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                        const FriendButton(),
+                            ElevatedButton(
                               onPressed: () {
                                 Get.to(FriendPage());
                                 // write function here
                               },
-                              // child: Text('Change Profile',
-                              //     style: TextStyle(
-                              //       color: Colors.black,
-                              //     )),
-                              // style: TextButton.styleFrom(
-                              //   shape: RoundedRectangleBorder(
-                              //     borderRadius: BorderRadius.circular(999),
-                              //     side: BorderSide(color: Colors.grey, width: 2),
-                              //   ),
-                              // ),
+                              style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.white,
+                                        foregroundColor: Colors.black,
+                                        padding: const EdgeInsets.symmetric(
+                                        horizontal: 16, vertical: 10),
+                                        textStyle: const TextStyle(fontSize: 16),
+                                      ),
                               child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Text('My',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 14,
-                                          overflow: TextOverflow.ellipsis,
-                                        )),
-                                    Text('Friends',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 14,
-                                          overflow: TextOverflow.ellipsis,
-                                        ))
-                                  ]),
-                            ))
+                                        Text('Lời mời'),
+                                        Text('kết bạn'),
+                                      ],
+                                  ),
+                            )])])
                       ],
                     ),
                     SizedBox(width: 10), // Add some space
                     Row(
                       children: <Widget>[
                         Text(
-                          'Account Name',
+                          user?.userName ?? 'Default Name',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
