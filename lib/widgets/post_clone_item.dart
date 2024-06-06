@@ -1,0 +1,211 @@
+import 'package:buzz_hub/core/values/app_colors.dart';
+import 'package:buzz_hub/modules/auth/views/postdetail_page.dart';
+import 'package:buzz_hub/services/dto/responses/count_like_post_response.dart';
+import 'package:buzz_hub/services/dto/responses/post_response.dart';
+import 'package:buzz_hub/widgets/post_clone_item.dart';
+import 'package:buzz_hub/services/post_service.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:http/http.dart';
+
+class PostItem extends StatefulWidget {
+  const PostItem({Key? key, required this.post}) : super(key: key);
+  final PostResponse post;
+
+  @override
+  State<PostItem> createState() => _PostItemState();
+}
+
+class _PostItemState extends State<PostItem> {
+  bool isLiked = false, isBookmarked = false; 
+  int likeCount = 0;
+  int commentCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchLikeCount();
+    // fetchCommentCount();
+  }
+
+  Future<void> fetchLikeCount() async {
+    int fetchedLikeCount = await PostService().getCountLike(widget.post.postId);
+    setState(() {
+      likeCount = fetchedLikeCount;
+    });
+  }
+  // Future<void> fetchCommentCount() async {
+  //   int fetchedCommentCount = await PostService().getCountComment(widget.post.postId);
+  //   setState(() {
+  //     commentCount = fetchedCommentCount;
+  //   });
+  // }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      margin: const EdgeInsets.only(bottom: 20),
+      width: double.infinity,
+      decoration: BoxDecoration(
+          border: Border.all(color: AppColors.Grey),
+          borderRadius: BorderRadius.circular(25.0)),
+      child: Column(children: <Widget>[
+        ListTile(
+          contentPadding: const EdgeInsets.only(left: 10, right: 0.0),
+          leading: Container(
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(
+                border: Border.all(color: Colors.blueAccent),
+                shape: BoxShape.circle,
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black45,
+                    offset: Offset(0, 2),
+                    blurRadius: 6.0,
+                  )
+                ]),
+            child: CircleAvatar(
+              backgroundImage: NetworkImage(
+                  'https://goexjtmckylmpnrbxtcn.supabase.co/storage/v1/object/public/users-avatar/' +
+                      widget.post.author!.avatarUrl!),
+            ),
+          ),
+          title: Text(
+            widget.post.author!.fullName!,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          subtitle: Text(
+            widget.post.createdAt!.toString(),
+            style: TextStyle(fontSize: 12),
+          ),
+          trailing: IconButton(
+            icon: const Icon(Icons.more_vert),
+            color: Colors.black,
+            onPressed: () => print("More"),
+          ),
+        ),
+        Column(
+          children: [
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: Text(
+                softWrap: true,
+                widget.post.textContent!,
+                textAlign: TextAlign.left,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            Container(
+                margin: const EdgeInsets.all(10.0),
+                width: Get.width,
+                height: Get.width - 40,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(25.0),
+                    boxShadow: const [
+                      BoxShadow(
+                          color: Colors.black45,
+                          offset: Offset(0, 5),
+                          blurRadius: 8.0)
+                    ],
+                    image: DecorationImage(
+                        fit: BoxFit.cover,
+                        image: NetworkImage(
+                            'https://goexjtmckylmpnrbxtcn.supabase.co/storage/v1/object/public/users-avatar/' +
+                                widget.post.imageContent!.first)))),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        IconButton(
+                          icon: Icon(
+                            isLiked ? Icons.favorite : Icons.favorite_border,
+                            color: isLiked ? Colors.pink : null,
+                          ),
+                          iconSize: 20.0,
+                          onPressed: () {
+                            setState(() {
+                              isLiked = !isLiked;
+                            });
+                          },
+                        ),
+                        Text(
+                          '$likeCount',
+                          style: TextStyle(
+                            fontSize: 14.0,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        )
+                      ],
+                    ),
+                    const SizedBox(width: 5),
+                    Row(
+                      children: <Widget>[
+                        IconButton(
+                          icon: const Icon(Icons.comment_rounded),
+                          iconSize: 20.0,
+                          color: Colors.black,
+                          onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PostDetailPage(post: widget.post),
+                            ),
+                          ),
+                        ),
+                        Text(
+                          '$commentCount',
+                          style: TextStyle(
+                            fontSize: 14.0,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        )
+                      ],
+                    ),
+                    const SizedBox(width: 5),
+                    Row(
+                      children: <Widget>[
+                        IconButton(
+                          icon: const Icon(Icons.share),
+                          iconSize: 20.0,
+                          color: Colors.black,
+                          onPressed: () => print('Share'),
+                        ),
+                        const Text(
+                          '',
+                          style: TextStyle(
+                            fontSize: 14.0,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        )
+                      ],
+                    ),
+                  ],
+                ),
+                IconButton(
+                  icon: Icon(
+                    isBookmarked
+                        ? Icons.bookmark
+                        : Icons.bookmark_border_outlined,
+                  ),
+                  iconSize: 20.0,
+                  color: Colors.black,
+                  onPressed: () {
+                    setState(() {
+                      isBookmarked = !isBookmarked;
+                    });
+                  },
+                ),
+              ],
+            ),
+          ],
+        )
+      ]),
+    );
+  }
+}

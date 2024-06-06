@@ -44,7 +44,7 @@ class LoginPage extends StatelessWidget {
               const SizedBox(height: 40),
               TextField(
                 controller: controller.usernameCtrl,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                     enabledBorder: UnderlineInputBorder(
                       borderSide: BorderSide(
                         color: AppColors.Grey,

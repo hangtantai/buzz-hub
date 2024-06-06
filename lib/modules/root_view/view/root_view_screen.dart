@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:stylish_bottom_bar/stylish_bottom_bar.dart';
+import 'package:buzz_hub/modules/post/views/create_post_page.dart';
 
 class RootViewScreen extends StatelessWidget {
   const RootViewScreen({super.key});
@@ -83,10 +84,13 @@ class RootViewScreen extends StatelessWidget {
           floatingActionButton: FloatingActionButton(
             shape: CircleBorder(),
             onPressed: () {
-              // to add post page
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CreatePost()),
+                );
             },
             backgroundColor: AppColors.Purple,
-            child: Icon(
+            child: const Icon(
               CupertinoIcons.add,
               color: Colors.white,
             ),
