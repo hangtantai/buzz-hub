@@ -4,6 +4,7 @@ import 'package:buzz_hub/modules/profile/views/profile.dart';
 import 'package:buzz_hub/modules/search/views/search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:buzz_hub/modules/auth/views/login_page.dart';
 
 class RootViewController extends GetxController {
   late PageController pageController;
@@ -12,11 +13,12 @@ class RootViewController extends GetxController {
   var isReadList = Rx<List<String>>([]);
   final text = TextEditingController();
 
+
   final screens = <Widget>[
     HomePage(), //home page
     MySearchBarApp(), //search page
     ConversationPage(),
-    ProfileScreen(), //account page
+    ProfileScreen(user: LoginPage.currentUser!), //account page
   ];
 
   @override
