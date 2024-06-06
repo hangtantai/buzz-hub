@@ -46,26 +46,26 @@ class ProfileScreen extends StatelessWidget {
     return Scaffold(
         appBar: AppBar(
           leading: IconButton(
-              icon: Icon(Icons.arrow_back), // Use the back arrow icon
-              onPressed: () {
-                // Handle the back button press (e.g., navigate back)
-                Navigator.of(context).pop();
-              },
-            ),
+            icon: Icon(Icons.arrow_back), // Use the back arrow icon
+            onPressed: () {
+              // Handle the back button press (e.g., navigate back)
+              Navigator.of(context).pop();
+            },
+          ),
           title: Text("Trang cá nhân"),
           centerTitle: false,
           actions: [
             IconButton(
                 onPressed: () {
-                  // write function here
-                  Obx(() => IconButton(
-                      icon: Icon(
-                        c.isFavorited.value
-                            ? Icons.favorite
-                            : Icons.favorite_border,
-                        color: c.isFavorited.value ? Colors.pink : null,
-                      ),
-                      onPressed: c.toggleFavorite));
+                  navigateToAccountDetailsPage();
+                  // Obx(() => IconButton(
+                  //     icon: Icon(
+                  //       c.isFavorited.value
+                  //           ? Icons.favorite
+                  //           : Icons.favorite_border,
+                  //       color: c.isFavorited.value ? Colors.pink : null,
+                  //     ),
+                  //     onPressed: c.toggleFavorite));
                 },
                 icon: Icon(Icons.settings)),
             IconButton(
@@ -148,40 +148,40 @@ class ProfileScreen extends StatelessWidget {
                         ),
                         SizedBox(width: 10),
                         SizedBox(
-                          width: screenWidth * 0.3 ,
-                          height: screenHeight * 0.07,
-                          child: ElevatedButton(
-                          onPressed: () {
-                            navigateToAccountDetailsPage();
-                            // write function here
-                          },
-                          child: Text('Change Profile',
-                              style: TextStyle(
-                                color: Colors.black,
-                              )),
-                          style: TextButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(999),
-                              side: BorderSide(color: Colors.grey, width: 2),
-                            ),
-                          ),
-                          child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text('My',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 14,
-                                overflow: TextOverflow.ellipsis,
-                              )),
-                              Text('Friends',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 14,
-                                overflow: TextOverflow.ellipsis,
-                              ))
-                              ]),
-                        ))
+                            width: screenWidth * 0.3,
+                            height: screenHeight * 0.07,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                Get.to(FriendPage());
+                                // write function here
+                              },
+                              // child: Text('Change Profile',
+                              //     style: TextStyle(
+                              //       color: Colors.black,
+                              //     )),
+                              // style: TextButton.styleFrom(
+                              //   shape: RoundedRectangleBorder(
+                              //     borderRadius: BorderRadius.circular(999),
+                              //     side: BorderSide(color: Colors.grey, width: 2),
+                              //   ),
+                              // ),
+                              child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text('My',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 14,
+                                          overflow: TextOverflow.ellipsis,
+                                        )),
+                                    Text('Friends',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 14,
+                                          overflow: TextOverflow.ellipsis,
+                                        ))
+                                  ]),
+                            ))
                       ],
                     ),
                     SizedBox(width: 10), // Add some space
@@ -293,7 +293,6 @@ class CommentScreen extends StatelessWidget {
   }
 }
 
-
 class FriendRequest {
   final AssetImage avatarUrl;
   final String name;
@@ -318,12 +317,14 @@ class _FriendPageState extends State<FriendPage> {
     FriendRequest(
       avatarUrl: const AssetImage('assets/images/user.jpg'),
       name: 'Alice Johnson',
-      requestTime: DateTime.now().subtract(const Duration(minutes: 5)), // Example: 5 minutes ago
+      requestTime: DateTime.now()
+          .subtract(const Duration(minutes: 5)), // Example: 5 minutes ago
     ),
     FriendRequest(
       avatarUrl: const AssetImage('assets/images/user.jpg'),
       name: 'Bob Williams',
-      requestTime: DateTime.now().subtract(const Duration(hours: 2)), // Example: 2 hours ago
+      requestTime: DateTime.now()
+          .subtract(const Duration(hours: 2)), // Example: 2 hours ago
     ),
     // ... more friend requests
   ];
@@ -352,26 +353,23 @@ class _FriendPageState extends State<FriendPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: [
-                          Text(
-                        friend.name,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const Spacer(),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 8.0),
-                        child: Text(
-                          _formatTimeDifference(friend.requestTime),
+                      Row(children: [
+                        Text(
+                          friend.name,
                           style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey,
-                          )
-                        )
-                      )
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const Spacer(),
+                        Padding(
+                            padding: const EdgeInsets.only(left: 8.0),
+                            child:
+                                Text(_formatTimeDifference(friend.requestTime),
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey,
+                                    )))
                       ]),
                       const SizedBox(height: 10),
                       Row(
@@ -385,7 +383,8 @@ class _FriendPageState extends State<FriendPage> {
                                 backgroundColor: Colors.blue,
                                 minimumSize: const Size.fromHeight(40),
                               ),
-                              child: const Text('Accept', style: TextStyle(color: Colors.white)),
+                              child: const Text('Accept',
+                                  style: TextStyle(color: Colors.white)),
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -398,7 +397,8 @@ class _FriendPageState extends State<FriendPage> {
                                 backgroundColor: Colors.grey,
                                 minimumSize: const Size.fromHeight(40),
                               ),
-                              child: const Text('Remove', style: TextStyle(color: Colors.white)),
+                              child: const Text('Remove',
+                                  style: TextStyle(color: Colors.white)),
                             ),
                           ),
                         ],
@@ -406,7 +406,6 @@ class _FriendPageState extends State<FriendPage> {
                     ],
                   ),
                 ),
-
               ],
             ),
           );
