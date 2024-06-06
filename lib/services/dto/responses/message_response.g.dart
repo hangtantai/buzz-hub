@@ -15,9 +15,9 @@ MessageResponse _$MessageResponseFromJson(Map<String, dynamic> json) =>
       groupId: json['groupId'] as String?,
       senderName: json['senderName'] as String?,
       senderAvatar: json['senderAvatar'] as String?,
-      reactions: (json['reactions'] as List<dynamic>?)
-          ?.map((e) => ReactionResponse.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      sentAt: json['sentAt'] == null
+          ? null
+          : DateTime.parse(json['sentAt'] as String),
     );
 
 Map<String, dynamic> _$MessageResponseToJson(MessageResponse instance) =>
@@ -29,5 +29,5 @@ Map<String, dynamic> _$MessageResponseToJson(MessageResponse instance) =>
       'groupId': instance.groupId,
       'senderName': instance.senderName,
       'senderAvatar': instance.senderAvatar,
-      'reactions': instance.reactions,
+      'sentAt': instance.sentAt?.toIso8601String(),
     };
