@@ -7,114 +7,39 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:share/share.dart';
 import 'package:buzz_hub/services/dto/responses/current_user_response.dart';
 import 'package:buzz_hub/core/values/constant.dart';
-import 'package:buzz_hub/modules/profile/views/list_friend_page.dart';
-import 'package:buzz_hub/services/friend_service.dart';
-class Controller extends GetxController {
-  var isFavorited = false.obs;
-  void toggleFavorite() {
-    isFavorited.toggle();
-  }
+import 'package:buzz_hub/services/get_post_by_user.dart';
+import 'package:buzz_hub/modules/profile/views/friend_button.dart';
+import 'package:buzz_hub/services/dto/responses/post_user_response.dart';
 
-  void savePost(BuildContext context) {
-    // Implement your logic to save a post here
-    // For example, you might want to add the post to a database
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('You have saved this post!')),
-    );
-  }
-}
 
-class FriendButton extends StatefulWidget {
-  const FriendButton({Key? key}) : super(key: key);
+class ProfileScreen extends StatefulWidget {
+  final CurrentUserResponse? user;
+  const ProfileScreen({Key? key, this.user}) : super(key: key);
 
   @override
-  State<FriendButton> createState() => _FriendButtonState();
+  State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _FriendButtonState extends State<FriendButton> {
-  int _friendCount = 0;
-  final FriendService _friendService = FriendService();
 
-  @override
+class _ProfileScreenState extends State<ProfileScreen> {
+  late Future<List<PostUserResponse>?> futurePosts;
+
+
+  PostResponse postResponse = PostResponse(
+        postId: "1",
+        textContent:
+            "It is a long established fact that a reader will bee distracted by the readable content ... 100000000000000000000000000000000000000000000000000000000",
+        imageContent: [LoginPage.currentUser!.avatarUrl!],
+        author: LoginPage.currentUser,
+        createdAt: DateTime.now());
+
   void initState() {
     super.initState();
-    _fetchFriendCount();
+    futurePosts = PostServiceByUser().getPostByUser(widget.user!.userName ?? '');
   }
-
-  Future<void> _fetchFriendCount() async {
-    final friends = await _friendService.getAllFriend();
-    setState(() {
-      _friendCount = friends?.length ?? 0;
-    });
-  }
-
-  Future<void> _navigateToFriendList() async {
-    final friends = await _friendService.getAllFriend();
-    if (friends != null) {
-      Get.to(() => FriendListPage(friends: friends));
-    } else {
-      Get.snackbar('Error', 'Failed to load friends');
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: _navigateToFriendList,
-      style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.black,
-              padding: const EdgeInsets.symmetric(
-              horizontal: 16, vertical: 10),
-              textStyle: const TextStyle(fontSize: 16),
-            ),
-    child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-              Text('$_friendCount'),
-              Text('Friends'),
-            ],
-        ),
-      // child: Column(
-      //   mainAxisAlignment: MainAxisAlignment.center,
-      //   children: [
-      //     Text(
-      //       '$_friendCount',
-      //       style: const TextStyle(
-      //         fontSize: 20,
-      //         fontWeight: FontWeight.bold,
-      //         color: Colors.black,
-      //         backgroundColor: Colors.white,
-      //       ),
-      //     ),
-      //     const Text(
-      //       'Friends',
-      //       style: TextStyle(color: Colors.black),
-      //       ),
-      //   ],
-      // ),
-    );
-  }
-}
-
-
-
-
-
-class ProfileScreen extends StatelessWidget {
-  final CurrentUserResponse? user;
-  ProfileScreen({Key? key, this.user}) : super(key: key);
-  PostResponse postResponse = PostResponse(
-      postId: "1",
-      textContent:
-          "It is a long established fact that a reader will bee distracted by the readable content ... 100000000000000000000000000000000000000000000000000000000",
-      imageContent: [LoginPage.currentUser!.avatarUrl!],
-      author: LoginPage.currentUser,
-      createdAt: DateTime.now());
 
   void navigateToAccountDetailsPage() {
     Get.to(AccountDetailsPage());
@@ -130,8 +55,6 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
         appBar: AppBar(
           leading: IconButton(
@@ -205,7 +128,7 @@ class ProfileScreen extends StatelessWidget {
                             child: CircleAvatar(
                               radius: 50,
                               backgroundImage:
-                                  getAvatarImage(user!),
+                                  getAvatarImage(widget.user!),
                             )),
                         SizedBox(width: 20), // Add some space
                         Row(
@@ -254,7 +177,7 @@ class ProfileScreen extends StatelessWidget {
                     Row(
                       children: <Widget>[
                         Text(
-                          user?.userName ?? 'Default Name',
+                          widget.user?.userName ?? 'Default Name',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -301,63 +224,29 @@ class ProfileScreen extends StatelessWidget {
   }
 }
 
-class CommentScreen extends StatelessWidget {
-  final TextEditingController _commentController = TextEditingController();
+// FutureBuilder<List<PostUserResponse>?>(
+//                       future: futurePosts,
+//                       builder: (context, snapshot) {
+//                         if (snapshot.connectionState == ConnectionState.waiting) {
+//                             return const Center(child: CircularProgressIndicator());
+//                           } else if (snapshot.hasError) {
+//                             return Center(child: Text('Error: ${snapshot.error}'));
+//                           } else if (snapshot.hasData && snapshot.data != null) {
+//                             List<PostUserResponse> posts = snapshot.data!.toList();
+//                             return ListView.builder(
+//                               itemCount: posts.length,
+//                               itemBuilder: (context, index) {
+//                                 final post = posts[index];
+//                                 // Use your PostItem widget here
+//                                 return postItemUser.PostItem(post: post);
+//                               },
+//                             );
+//                           } else {
+//                             return const Center(child: Text('No posts found.'));
+//                           }
+//                       }
+//                     ),
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Comments'),
-      ),
-      body: Column(
-        children: <Widget>[
-          Expanded(
-            child: ListView(
-              // This is where the comments would go.
-              // You might want to replace this with a StreamBuilder if you're loading comments from a database.
-              children: <Widget>[
-                ListTile(
-                  title: Text('User1'),
-                  subtitle: Text('This is a comment.'),
-                ),
-                ListTile(
-                  title: Text('User2'),
-                  subtitle: Text('This is another comment.'),
-                ),
-                // Add more ListTiles for more comments
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  child: TextField(
-                    controller: _commentController,
-                    decoration: InputDecoration(
-                      labelText: 'Write a comment...',
-                    ),
-                  ),
-                ),
-                IconButton(
-                  icon: Icon(Icons.send),
-                  onPressed: () {
-                    // Implement your comment posting logic here
-                    // For example, you might want to add the comment to your database
-                    print('Comment: ${_commentController.text}');
-                    _commentController.clear();
-                  },
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class FriendRequest {
   final AssetImage avatarUrl;
