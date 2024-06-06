@@ -24,7 +24,7 @@ class _EditBirthdayPageState extends State<EditBirthdayPage> {
   @override
   void initState() {
     super.initState();
-    dateOfBirth = accountDetailController.currentUser.value?.dob ?? DateTime(1990, 1, 1);
+    dateOfBirth = accountDetailController.currentUser.value?.dob ?? DateTime(1900, 1, 1);
   }
 
   @override
@@ -92,7 +92,8 @@ class _EditBirthdayPageState extends State<EditBirthdayPage> {
                   context: context,
                   firstDate: DateTime(1900), 
                   lastDate: DateTime.now(),
-                  initialDate: dateOfBirth,
+                  //initialDate: dateOfBirth,
+                  initialDate: dateOfBirth.isAfter(DateTime(1900)) ? dateOfBirth : DateTime(1900),
                 );
                 if (pickedDate != null && pickedDate != dateOfBirth) {
                   setState(() {
