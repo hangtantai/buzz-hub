@@ -15,6 +15,8 @@ class ConversationPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(
+        'https://goexjtmckylmpnrbxtcn.supabase.co/storage/v1/object/public/users-avatar/${LoginPage.currentUser!.avatarUrl!}');
     return Scaffold(
       backgroundColor: Color(0xFFF6F2FF),
       appBar: AppBar(
