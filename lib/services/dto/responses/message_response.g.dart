@@ -15,6 +15,9 @@ MessageResponse _$MessageResponseFromJson(Map<String, dynamic> json) =>
       groupId: json['groupId'] as String?,
       senderName: json['senderName'] as String?,
       senderAvatar: json['senderAvatar'] as String?,
+      sentAt: json['sentAt'] == null
+          ? null
+          : DateTime.parse(json['sentAt'] as String),
     );
 
 Map<String, dynamic> _$MessageResponseToJson(MessageResponse instance) =>
@@ -26,4 +29,5 @@ Map<String, dynamic> _$MessageResponseToJson(MessageResponse instance) =>
       'groupId': instance.groupId,
       'senderName': instance.senderName,
       'senderAvatar': instance.senderAvatar,
+      'sentAt': instance.sentAt?.toIso8601String(),
     };

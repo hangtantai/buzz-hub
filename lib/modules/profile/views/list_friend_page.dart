@@ -1,3 +1,4 @@
+import 'package:buzz_hub/core/values/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:buzz_hub/services/dto/responses/current_user_response.dart'; // Import your user model
 
@@ -16,6 +17,7 @@ class FriendListPage extends StatelessWidget {
         itemCount: friends.length,
         itemBuilder: (context, index) {
           final friend = friends[index];
+          var avatar = Constants.HOST_AVATAR_URL+friend.avatarUrl!;
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
             child: Row(
@@ -23,7 +25,8 @@ class FriendListPage extends StatelessWidget {
                 // Avatar
                 CircleAvatar(
                   radius: 30,
-                  backgroundImage: NetworkImage(friend.avatarUrl ?? ''), // Use friend's avatar URL
+                  
+                  backgroundImage: NetworkImage(avatar), // Use friend's avatar URL
                 ),
                 const SizedBox(width: 16), // Space between avatar and details
                 // Username and Unfriend Button
