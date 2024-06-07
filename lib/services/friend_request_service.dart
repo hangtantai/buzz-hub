@@ -73,10 +73,32 @@ class FriendRequestService {
     }
   }
 
-  Future<bool> AcceptFriendRequest(String userName) async {
+  Future<bool> acceptFriendRequest(String userName) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? accessToken = prefs.getString(Constants.ACCESS_TOKEN);
     final url = '${Constants.BASE_URL}/$endpoint/Accept/$userName';
+    try {
+      bool res = await Dio()
+          .get(url,
+              options: Options(headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer $accessToken",
+              }))
+          .then((value) {
+        bool result = BaseResponse.fromJson(value.data).success;
+        return result;
+      });
+
+      return res;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool> declineFriendRequest(String userName) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? accessToken = prefs.getString(Constants.ACCESS_TOKEN);
+    final url = '${Constants.BASE_URL}/$endpoint/Decline/$userName';
     try {
       bool res = await Dio()
           .get(url,

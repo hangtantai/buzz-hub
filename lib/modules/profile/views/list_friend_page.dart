@@ -35,7 +35,7 @@ class FriendListPage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween, // Align items to start and end
                     children: [
                       Text(
-                        friend.userName ?? 'User', // Display friend's username
+                        friend.fullName ?? 'User', // Display friend's username
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w500,

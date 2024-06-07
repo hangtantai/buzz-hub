@@ -23,15 +23,15 @@ class FriendRequestController extends GetxController {
     listRequest.value = await onLoadRequest() ?? [];
     //listFriend.value = await onLoadFriend() ?? [];
   }
-  // void onAccept(String userName) async{
-  //   var isAccepted = await AcceptFriendRequest()
-  // }
+  Future<bool>onDecline(String userName) async{
+ FriendRequestService friendRequestService = FriendRequestService();
+    bool res = await friendRequestService.declineFriendRequest(userName);
+
+    return res;
+  }
   Future<bool> onAccept(String userName) async{
     FriendRequestService friendRequestService = FriendRequestService();
-     final res = await friendRequestService.AcceptFriendRequest(userName);
-    if (res == false) {
-      return false;
-    }
+    final res = await friendRequestService.acceptFriendRequest(userName);
     return res;
   }
   Future<List<GetFriendRequestResponse>?> onLoadRequest() async {

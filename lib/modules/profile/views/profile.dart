@@ -276,7 +276,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Row(
                       children: <Widget>[
                         Text(
-                          widget.user?.userName ?? 'Default Name',
+                          user?.fullName ?? 'Default Name',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -428,7 +428,7 @@ class FriendPage extends StatelessWidget {
                                             return AlertDialog(
                                               title: const Text('Thông báo'),
                                               content: Text(
-                                                'Bạn và ${friend.userId} đã trở thành bạn bè',
+                                                'Bạn và ${friend.name} đã trở thành bạn bè',
                                               ),
                                               actions: <Widget>[
                                                 TextButton(
@@ -463,8 +463,17 @@ class FriendPage extends StatelessWidget {
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: ElevatedButton(
-                                    onPressed: () {
-                                      // Handle remove button press for friend at index
+                                    onPressed: () async{
+                                      bool isSuccess = await controller
+                                          .onDecline(friend.userId!);
+
+                                          if(isSuccess){
+
+                                                    controller.listRequest
+                                                        .value = await controller
+                                                            .onLoadRequest() ??
+                                                        [];
+                                          }
                                     },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: AppColors.Grey,
