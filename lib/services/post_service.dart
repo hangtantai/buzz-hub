@@ -14,7 +14,7 @@ class PostService {
   Future<PostResponse> getPostById(int id) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? accessToken = prefs.getString(Constants.ACCESS_TOKEN);
-    final url = '${Constants.BASE_URL}/posts/$id'; // Adjust the endpoint as needed
+    final url = '${Constants.BASE_URL}/$endpoint/$id'; // Adjust the endpoint as needed
 
     final Response response = await Dio().get(
       url,
@@ -94,7 +94,8 @@ class PostService {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final String? accessToken = prefs.getString(Constants.ACCESS_TOKEN);
-      final url = '${Constants.BASE_URL}/$endpoint/';
+      // final url = '${Constants.BASE_URL}/$endpoint/CountPostLike?postId=$postId';
+      final url = 'https://chatable.azurewebsites.net/api/v1/Posts/CountPostLike?$postId';
       final res = await Dio()
         .get(
           url,
@@ -117,7 +118,7 @@ class PostService {
     }
   }
 
-  Future<bool> likePost() async {
+  Future<bool> likePost(int Id) async {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final String? accessToken = prefs.getString(Constants.ACCESS_TOKEN);
@@ -128,7 +129,7 @@ class PostService {
         return false;
       }
 
-      final url = '${Constants.BASE_URL}/$endpoint/';
+      final url = '${Constants.BASE_URL}/$endpoint/Like/$Id';
       final res = await Dio().post(
         url,
         options: Options(headers: {
@@ -136,7 +137,15 @@ class PostService {
           "Authorization": "Bearer $accessToken",
         }),
       );
-      return true;
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        // Assuming the API returns 200 or 201 for a successful request
+        return true;
+      } else {
+        // Handle unexpected status codes
+        // print('Failed to like post: ${res.statusCode} - ${res.statusMessage}');
+        return false;
+      }
     } 
     catch (e) {
       // Handle any exceptions that occur during the request
@@ -145,7 +154,7 @@ class PostService {
     }
   }
 
-  Future<bool> dislikePost() async {
+  Future<bool> dislikePost(int Id) async {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final String? accessToken = prefs.getString(Constants.ACCESS_TOKEN);
@@ -156,7 +165,7 @@ class PostService {
         return false;
       }
 
-      final url = '${Constants.BASE_URL}/$endpoint/';
+      final url = '${Constants.BASE_URL}/$endpoint/DisLike/$Id';
       final res = await Dio().delete(
         url,
         options: Options(headers: {
@@ -164,7 +173,12 @@ class PostService {
           "Authorization": "Bearer $accessToken",
         }),
       );
-      return true;
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        return true;
+      } else {
+        return false;
+      }
     } catch (e) {
       // Handle any exceptions that occur during the request
       // print('Error occurred while disliking post: $e');

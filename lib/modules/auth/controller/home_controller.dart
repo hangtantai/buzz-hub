@@ -34,15 +34,15 @@ class HomeController extends GetxController {
     return res;
   }
 
-  Future<bool> likePost() async {
+  Future<bool> likePost(int Id) async {
     PostService postService = PostService();
-    final res = await postService.likePost();
+    final res = await postService.likePost(Id);
     return res;
   }
 
-  Future<bool> dislikePost() async {
+  Future<bool> dislikePost(int Id) async {
     PostService postService = PostService();
-    final res = await postService.dislikePost();
+    final res = await postService.dislikePost(Id);
     return res;
   }
 

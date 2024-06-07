@@ -1,5 +1,6 @@
 import 'package:buzz_hub/core/values/app_colors.dart';
 import 'package:buzz_hub/modules/auth/views/postdetail_page.dart';
+import 'package:buzz_hub/modules/auth/views/login_page.dart';
 import 'package:buzz_hub/modules/profile/views/profile.dart';
 import 'package:buzz_hub/services/dto/responses/post_response.dart';
 import 'package:buzz_hub/services/dto/responses/current_user_response.dart';
@@ -20,10 +21,12 @@ class PostItem extends StatefulWidget {
 }
 
 class _PostItemState extends State<PostItem> {
-  bool isLiked = false, isBookmarked = false;
+  bool isLiked = false, 
+  isBookmarked = false;
   int likeCount = 0;
   int commentCount = 0;
   CurrentUserResponse? author = null;
+  bool isHidden = false;
 
   @override
   void initState() {
@@ -38,11 +41,25 @@ class _PostItemState extends State<PostItem> {
       likeCount = fetchedLikeCount;
     });
   }
-  Future<void> fetchgetAuthor() async {
-    CurrentUserResponse? auth = await controller.getUser(widget.post.author!.userName!);
-    setState(() {
-      author = auth;
-    });
+  // Future<void> fetchgetAuthor() async {
+  //   CurrentUserResponse? auth = await controller.getUser(widget.post.author!.userName!);
+  //   setState(() {
+  //     author = auth;
+  //   });
+  // }
+  Future<void> fetchLike() async {
+    bool isLikedtemp = await controller.likePost(widget.post.postId!);
+
+    if (isLikedtemp) {
+      bool temp = await controller.dislikePost(widget.post.postId!);
+      setState(() {
+        isLiked = false;
+      });
+    } else {
+      setState(() {
+        isLiked = true;
+      });
+    }
   }
   // Future<void> fetchCommentCount() async {
   //   int fetchedCommentCount = await PostService().getCountComment(widget.post.postId);
@@ -66,8 +83,77 @@ class _PostItemState extends State<PostItem> {
     // }
   }
 
+void _showDeleteConfirmationDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text("Delete Post"),
+        content: Text("Are you sure you want to delete this post?"),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Close the dialog
+              // Perform delete action here
+              setState(() {
+                isHidden = true;
+              });
+            },
+            child: Text("Yes"),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Close the dialog
+            },
+            child: Text("No"),
+          ),
+        ],
+      );
+    },
+  );
+  }
+
+  void _onPopupMenuSelected(String value) {
+    switch (value) {
+      case 'edit':
+        // edit action
+        break;
+      case 'delete':
+        _showDeleteConfirmationDialog(context);
+        break;
+      case 'hide':
+        setState(() {
+          isHidden = true;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Post hidden'),
+            action: SnackBarAction(
+              label: 'Undo',
+              onPressed: () {
+                setState(() {
+                  isHidden = false;
+                });
+              },
+            ),
+          ),
+        );
+        break;
+    }
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
+
+    if (isHidden) {
+      return SizedBox.shrink(); // Return an empty widget if the post is hidden
+    }
+
+    bool isAuthor = widget.post.author!.fullName! == LoginPage.currentUser?.fullName;
+
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
       margin: const EdgeInsets.only(bottom: 20),
@@ -119,15 +205,63 @@ class _PostItemState extends State<PostItem> {
               widget.post.createdAt!.toString(),
               style: TextStyle(fontSize: 12),
             ),
-            trailing: IconButton(
+            trailing: PopupMenuButton<String>(
               icon: const Icon(Icons.more_vert),
-              color: Colors.black,
-              onPressed: () => print("More"),
+              onSelected: _onPopupMenuSelected,
+              itemBuilder: (BuildContext context) {
+                return isAuthor
+                    ? [
+                        PopupMenuItem<String>(
+                          value: 'hide',
+                          child: const Row(
+                            children: const [
+                              Icon(Icons.visibility_off, color: Colors.black),
+                              SizedBox(width: 8),
+                              Text('Hide'),
+                            ],
+                          ),
+                        ),
+                        PopupMenuItem<String>(
+                          value: 'edit',
+                          child: const Row(
+                            children: const [
+                              Icon(Icons.edit, color: Colors.black),
+                              SizedBox(width: 8),
+                              Text('Edit'),
+                            ],
+                          ),
+                        ),
+                        PopupMenuItem<String>(
+                          value: 'delete',
+                          child: const Row(
+                            children: const [
+                              Icon(Icons.delete, color: Colors.black),
+                              SizedBox(width: 8),
+                              Text('Delete'),
+                            ],
+                          ),
+                        ),
+                      ]
+                    : [
+                        PopupMenuItem<String>(
+                          value: 'hide',
+                          child: Row(
+                            children: const [
+                              Icon(Icons.visibility_off, color: Colors.black),
+                              SizedBox(width: 8),
+                              Text('Hide'),
+                            ],
+                          ),
+                        ),
+                      ];
+              },
             ),
           ),
           Column(
+            crossAxisAlignment: CrossAxisAlignment.start, // Ensures children are aligned to the left
             children: [
               Container(
+                alignment: Alignment.centerLeft, // Ensures text is aligned to the left
                 margin: const EdgeInsets.symmetric(horizontal: 10.0),
                 child: Text(
                   widget.post.textContent!,
@@ -185,12 +319,13 @@ class _PostItemState extends State<PostItem> {
                             iconSize: 20.0,
                             onPressed: () {
                               setState(() {
+                                
                                 isLiked = !isLiked;
                                 if (isLiked) {
-                                  HomeController().likePost();
+                                  HomeController().likePost(widget.post.postId!);
                                   likeCount ++;
                                 } else {
-                                  HomeController().dislikePost();
+                                  HomeController().dislikePost(widget.post.postId!);
                                   likeCount --;
                                 }
                               });

@@ -7,9 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:buzz_hub/modules/auth/controller/home_controller.dart';
 
-
 String? myAvtPath = LoginPage.currentUser?.avatarUrl;
-String? myName = LoginPage.currentUser?.userName;
+String? myName = LoginPage.currentUser?.fullName;
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -35,6 +34,13 @@ class _HomePageState extends State<HomePage> {
       print(postList);
       isLoading = false;
     });
+  }
+
+  Future<void> _refresh() async {
+    setState(() {
+      isLoading = true;
+    });
+    await fetchPosts();
   }
 
   @override
@@ -67,14 +73,19 @@ class _HomePageState extends State<HomePage> {
           ? Center(child: CircularProgressIndicator())
           : postList == null
               ? Center(child: Text('No posts available'))
-              : SingleChildScrollView(
-                  child: Column(
-                    children: postList!.map((p) => PostItem(post: p)).toList(),
+              : RefreshIndicator(
+                  onRefresh: _refresh,
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: Column(
+                      children: postList!.map((p) => PostItem(post: p)).toList(),
+                    ),
                   ),
                 ),
     );
   }
 }
+
 
 
 
