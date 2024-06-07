@@ -12,7 +12,7 @@ import 'package:buzz_hub/core/values/constant.dart';
 import 'package:buzz_hub/services/get_post_by_user.dart';
 import 'package:buzz_hub/modules/profile/views/friend_button.dart';
 import 'package:buzz_hub/services/dto/responses/post_user_response.dart';
-
+import 'package:buzz_hub/widgets/post_item_user.dart' as post_user;
 
 
 class ProfileScreen extends StatefulWidget {
@@ -38,7 +38,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void initState() {
     super.initState();
-    futurePosts = PostServiceByUser().getPostByUser(widget.user!.userName ?? '');
+    futurePosts = PostServiceByUser().getPostByUser(widget.user!.userName ?? 'ronaldo');
   }
 
   void navigateToAccountDetailsPage() {
