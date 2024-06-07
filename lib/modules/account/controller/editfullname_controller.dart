@@ -21,6 +21,12 @@ class EditFullNameController extends GetxController {
       final r = await userService.getCurrentUser();
       currentUser.value = r; 
       
+      if (newFullName.trim() == '') {
+        errorMessage.value = "Họ Tên không được để trống";
+        isLoading.value = false;
+        return false; 
+      }
+       
       if (newFullName.trim() == currentUser.value!.fullName!.trim()) {
         errorMessage.value = "Họ Tên không thay đổi";
         isLoading.value = false;

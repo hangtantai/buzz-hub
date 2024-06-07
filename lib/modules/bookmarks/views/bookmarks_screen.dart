@@ -180,6 +180,15 @@ class _CreateBookmarks extends State<BookMarks> {
     );
 }
 
+  @override
+  Widget build(BuildContext context) {
+    PostResponse postResponse = PostResponse(
+        postId: 1,
+        textContent:
+            "It is a long established fact that a reader will bee distracted by the readable content ... 100000000000000000000000000000000000000000000000000000000",
+        imageContent: [LoginPage.currentUser!.avatarUrl!],
+        author: LoginPage.currentUser,
+        createdAt: DateTime.now());
     return Scaffold(
         appBar: AppBar(
             title: const Text('Bookmarks',

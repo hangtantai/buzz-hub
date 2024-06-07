@@ -5,7 +5,7 @@ part 'post_response.g.dart';
 
 @JsonSerializable()
 class PostResponse {
-  final String? postId;
+  final int? postId;
   final String? textContent;
   final List<String>? imageContent;
   final CurrentUserResponse? author;
