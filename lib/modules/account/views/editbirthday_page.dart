@@ -24,7 +24,7 @@ class _EditBirthdayPageState extends State<EditBirthdayPage> {
   @override
   void initState() {
     super.initState();
-    dateOfBirth = accountDetailController.currentUser.value?.dob ?? DateTime(1990, 1, 1);
+    dateOfBirth = accountDetailController.currentUser.value?.dob ?? DateTime(1900, 1, 1);
   }
 
   @override
@@ -92,7 +92,7 @@ class _EditBirthdayPageState extends State<EditBirthdayPage> {
                   context: context,
                   firstDate: DateTime(1900), 
                   lastDate: DateTime.now(),
-                  initialDate: dateOfBirth,
+                  initialDate: dateOfBirth.isAfter(DateTime(1900)) ? dateOfBirth : DateTime(1900),
                 );
                 if (pickedDate != null && pickedDate != dateOfBirth) {
                   setState(() {
@@ -126,26 +126,6 @@ class _EditBirthdayPageState extends State<EditBirthdayPage> {
 
             const SizedBox(height: 30),
             
-            // InkWell(
-            //   onTap: () async {
-                                  
-            //   },
-            //   child: Container(
-            //     width: double.infinity,
-            //     padding: const EdgeInsets.all(20),
-            //     decoration: BoxDecoration(
-            //         borderRadius: BorderRadius.circular(12),
-            //         color: AppColors.Purple),
-            //     child: const Text(
-            //       'Lưu thay đổi',
-            //       textAlign: TextAlign.center,
-            //       style: TextStyle(
-            //           color: Colors.white,
-            //           fontWeight: FontWeight.w600,
-            //           fontSize: 16),
-            //     ),
-            //   ),
-            // )
             Obx(
               () => InkWell(
                 onTap: controller.isLoading.value

@@ -61,6 +61,9 @@ dependencies:
   country_picker: ^2.0.26
   intl: ^0.19.0
   timeago: ^3.6.1
+  video_player: ^2.8.6
+  video_thumbnail: ^0.5.3
+  permission_handler: ^11.3.1
 
 
 dev_dependencies:
