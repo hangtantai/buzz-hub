@@ -27,7 +27,7 @@ class Controller extends GetxController {
 class ProfileScreen extends StatelessWidget {
   final Controller c = Get.put(Controller());
   PostResponse postResponse = PostResponse(
-      postId: "1",
+      postId: 1,
       textContent:
           "It is a long established fact that a reader will bee distracted by the readable content ... 100000000000000000000000000000000000000000000000000000000",
       imageContent: [LoginPage.currentUser!.avatarUrl!],
