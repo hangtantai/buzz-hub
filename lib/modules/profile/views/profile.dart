@@ -9,9 +9,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:share/share.dart';
 import 'package:buzz_hub/services/dto/responses/current_user_response.dart';
 import 'package:buzz_hub/core/values/constant.dart';
+import 'package:buzz_hub/services/get_post_by_user.dart';
+import 'package:buzz_hub/modules/profile/views/friend_button.dart';
+import 'package:buzz_hub/services/dto/responses/post_user_response.dart';
+import 'package:buzz_hub/widgets/post_item_user.dart' as post_user;
+
+
+class ProfileScreen extends StatefulWidget {
 import 'package:buzz_hub/modules/profile/views/list_friend_page.dart';
 import 'package:buzz_hub/services/friend_service.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -106,7 +112,17 @@ class _FriendButtonState extends State<FriendButton> {
 
 class ProfileScreen extends StatelessWidget {
   final CurrentUserResponse? user;
-  ProfileScreen({Key? key, this.user}) : super(key: key);
+  const ProfileScreen({Key? key, this.user}) : super(key: key);
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  late Future<List<PostUserResponse>?> futurePosts;
+
+
   PostResponse postResponse = PostResponse(
       postId: 1,
       textContent:
@@ -114,6 +130,11 @@ class ProfileScreen extends StatelessWidget {
       imageContent: [LoginPage.currentUser!.avatarUrl!],
       author: LoginPage.currentUser,
       createdAt: DateTime.now());
+
+  void initState() {
+    super.initState();
+    futurePosts = PostServiceByUser().getPostByUser(widget.user!.userName ?? 'ronaldo');
+  }
 
   void navigateToAccountDetailsPage() {
     Get.to(AccountDetailsPage());
@@ -129,8 +150,6 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
         appBar: AppBar(
           leading: IconButton(
@@ -203,7 +222,8 @@ class ProfileScreen extends StatelessWidget {
                             },
                             child: CircleAvatar(
                               radius: 50,
-                              backgroundImage: getAvatarImage(user!),
+                              backgroundImage:
+                                  getAvatarImage(widget.user!),
                             )),
                         SizedBox(width: 20), // Add some space
                         Row(children: [
@@ -256,7 +276,7 @@ class ProfileScreen extends StatelessWidget {
                     Row(
                       children: <Widget>[
                         Text(
-                          user?.userName ?? 'Default Name',
+                          widget.user?.userName ?? 'Default Name',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -303,63 +323,29 @@ class ProfileScreen extends StatelessWidget {
   }
 }
 
-class CommentScreen extends StatelessWidget {
-  final TextEditingController _commentController = TextEditingController();
+// FutureBuilder<List<PostUserResponse>?>(
+//                       future: futurePosts,
+//                       builder: (context, snapshot) {
+//                         if (snapshot.connectionState == ConnectionState.waiting) {
+//                             return const Center(child: CircularProgressIndicator());
+//                           } else if (snapshot.hasError) {
+//                             return Center(child: Text('Error: ${snapshot.error}'));
+//                           } else if (snapshot.hasData && snapshot.data != null) {
+//                             List<PostUserResponse> posts = snapshot.data!.toList();
+//                             return ListView.builder(
+//                               itemCount: posts.length,
+//                               itemBuilder: (context, index) {
+//                                 final post = posts[index];
+//                                 // Use your PostItem widget here
+//                                 return postItemUser.PostItem(post: post);
+//                               },
+//                             );
+//                           } else {
+//                             return const Center(child: Text('No posts found.'));
+//                           }
+//                       }
+//                     ),
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Comments'),
-      ),
-      body: Column(
-        children: <Widget>[
-          Expanded(
-            child: ListView(
-              // This is where the comments would go.
-              // You might want to replace this with a StreamBuilder if you're loading comments from a database.
-              children: <Widget>[
-                ListTile(
-                  title: Text('User1'),
-                  subtitle: Text('This is a comment.'),
-                ),
-                ListTile(
-                  title: Text('User2'),
-                  subtitle: Text('This is another comment.'),
-                ),
-                // Add more ListTiles for more comments
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  child: TextField(
-                    controller: _commentController,
-                    decoration: InputDecoration(
-                      labelText: 'Write a comment...',
-                    ),
-                  ),
-                ),
-                IconButton(
-                  icon: Icon(Icons.send),
-                  onPressed: () {
-                    // Implement your comment posting logic here
-                    // For example, you might want to add the comment to your database
-                    print('Comment: ${_commentController.text}');
-                    _commentController.clear();
-                  },
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class FriendRequest {
   final AssetImage avatarUrl;

@@ -3,7 +3,6 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:buzz_hub/modules/profile/views/profile.dart' as profile;
 import 'package:buzz_hub/services/dto/responses/current_user_response.dart';
-import 'package:buzz_hub/modules/search/controller/search_bar_controller.dart';
 import 'package:buzz_hub/services/get_all_user_service.dart';
 import 'package:buzz_hub/services/dto/responses/get_all_user_response.dart';
 import 'package:buzz_hub/services/dto/requests/friend_request.dart';
@@ -375,111 +374,6 @@ class CustomSearchDelegate extends SearchDelegate {
     
   }
 }
-
-// return ListView.builder(
-//       itemCount: matchUser.length,
-//       itemBuilder: (context, index) {
-//         var user = matchUser[index];
-//         return Row(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             Container(
-//               padding: const EdgeInsets.only(left: 12),
-//               width: MediaQuery.of(context).size.width * 0.2,
-//               child: CircleAvatar(
-//                 radius: 50,
-//                 backgroundImage: getAvatarImage(user),
-//             ),
-//             ),
-//             SizedBox(
-//             width: MediaQuery.of(context).size.width * 0.03,
-//           ),
-//           Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             Text(
-//                 user.userName, // Display the username here
-//                 style: TextStyle(
-//                   fontSize: 20,
-//                   fontWeight: FontWeight.bold,
-//                 ),
-//               ),
-//             Container(
-//               alignment: Alignment.centerRight,
-//               margin: const EdgeInsets.only(right: 12),
-//               padding: const EdgeInsets.all(5),
-//               decoration: BoxDecoration(
-//                 color: Colors.transparent,
-//                 borderRadius: BorderRadius.circular(2),
-//                 border: Border.all(
-//                   color: Color(0xFFF2F2F2),
-//                 ),
-//               ),
-//               child: ElevatedButton(
-//                 onPressed: () async {
-//                   if (user.isFriend) {
-//                     showDialog(
-//                       context: context,
-//                       builder: (context) => AlertDialog(
-//                         title: Text('Unfriend ${user.userName}?'),
-//                         content: Text('Are you sure you want to unfriend ${user.userName}?'),
-//                         actions: [
-//                           TextButton(
-//                             onPressed: () async {
-//                               // try {
-//                               //   await friendRequestService.unfriendUser(user.userName);
-//                               //   Navigator.pop(context);
-//                               //   // Update the user's friend status here
-//                               // } catch (e) {
-//                               //   // Handle the exception here
-//                               // }
-//                             },
-//                             child: Text('Yes'),
-//                           ),
-//                           TextButton(
-//                             onPressed: () {
-//                               Navigator.pop(context);
-//                             },
-//                             child: Text('No'),
-//                           )
-//                         ]
-//                       )
-//                     );
-//                   } else {
-//                     try {
-//                       await friendRequestService.sendFriendRequest(FriendRequest(
-//                         receiverId: user.userName,
-//                       ));
-//                       // Update the user's friend status here
-//                     } catch (e) {
-//                       // Handle the exception here
-//                     }
-//                   }
-//                 },
-//                 child: FutureBuilder<bool?>(
-//                       future: service.checkFriendStatus(user.userName),
-//                       builder: (BuildContext context, AsyncSnapshot<bool?> snapshot) {
-//                         if (snapshot.connectionState == ConnectionState.waiting) {
-//                           return CircularProgressIndicator();  // Show a loading spinner while waiting
-//                         } else {
-//                           bool? isRequest = snapshot.data;
-//                           return Text(
-//                             user.isFriend ? 'Unfriend' : (isRequest == true ? 'Request Sent' : 'Add Friend'),
-//                             style: TextStyle(
-//                               color: user.isFriend ? Colors.red : (isRequest == true ? Colors.orange : Colors.green),
-//                               fontSize: 16,
-//                             ),
-//                           );
-//                         }
-//                       },
-//                     )
-//               ),
-//             )])
-//           ]
-//         );
-//       }
-      
-//     );
 
 // Custom ArticleCard widget (same as before)
 class ArticleCard extends StatelessWidget {
