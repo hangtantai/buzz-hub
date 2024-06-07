@@ -45,11 +45,11 @@ class _PostItemState extends State<PostItem> {
             child: CircleAvatar(
               backgroundImage: NetworkImage(
                   'https://goexjtmckylmpnrbxtcn.supabase.co/storage/v1/object/public/users-avatar/' +
-                      widget.post.author!.avatarUrl!),
+                      (widget.post.author?.avatarUrl ?? '')),
             ),
           ),
           title: Text(
-            widget.post.author!.fullName!,
+            widget.post.author?.fullName ?? '',
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           subtitle: Text(
@@ -68,7 +68,7 @@ class _PostItemState extends State<PostItem> {
               margin: const EdgeInsets.symmetric(horizontal: 10.0),
               child: Text(
                 softWrap: true,
-                widget.post.textContent!,
+                widget.post.textContent ?? '',
                 textAlign: TextAlign.left,
                 style: const TextStyle(
                   fontWeight: FontWeight.w600,
@@ -91,7 +91,7 @@ class _PostItemState extends State<PostItem> {
                         fit: BoxFit.cover,
                         image: NetworkImage(
                             'https://goexjtmckylmpnrbxtcn.supabase.co/storage/v1/object/public/users-avatar/' +
-                                widget.post.imageContent!.first)))),
+                                (widget.post.imageContent?.first ?? ''))))),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[

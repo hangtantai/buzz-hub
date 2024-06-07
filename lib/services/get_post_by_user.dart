@@ -1,3 +1,4 @@
+import 'package:buzz_hub/services/dto/responses/post_response.dart';
 import 'package:buzz_hub/services/dto/responses/post_user_response.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,7 +8,7 @@ import 'package:buzz_hub/core/values/constant.dart';
 class PostServiceByUser {
   static const endpoint = 'Posts/GetByUser';
 
-  Future<List<PostUserResponse>?> getPostByUser(String userName) async {
+  Future<List<PostResponse>?> getPostByUser(String userName) async {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final String? accessToken = prefs.getString(Constants.ACCESS_TOKEN);
@@ -30,8 +31,8 @@ class PostServiceByUser {
       if (res.statusCode == 200) {
         List<dynamic> postList = res.data['data'] as List<dynamic>;
         // Parse the response data
-        List<PostUserResponse> posts = postList
-            .map((json) => PostUserResponse.fromJson(json))
+        List<PostResponse> posts = postList
+            .map((json) => PostResponse.fromJson(json))
             .toList();
         return posts;
       } else {
