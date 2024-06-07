@@ -60,6 +60,10 @@ dependencies:
   iconsax: ^0.0.8
   country_picker: ^2.0.26
   intl: ^0.19.0
+  timeago: ^3.6.1
+  video_player: ^2.8.6
+  video_thumbnail: ^0.5.3
+  permission_handler: ^11.3.1
 
 
 dev_dependencies:
@@ -101,6 +105,7 @@ flutter:
     - assets/images/dance.png
     - assets/images/doremon.png
     - assets/images/trend.png
+    - assets/images/loader.gif
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

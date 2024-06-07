@@ -8,6 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class ConversationPage extends StatelessWidget {
   ConversationPage({super.key});
@@ -35,82 +36,65 @@ class ConversationPage extends StatelessWidget {
           style: TextStyle(fontWeight: FontWeight.w900, fontSize: 24),
         ),
         centerTitle: true,
-        actions: [
-          InkWell(
-            onTap: () async {},
-            child: Container(
-              margin: EdgeInsets.only(right: 4),
-              padding: EdgeInsets.all(4),
-              child: Icon(Icons.search, color: Colors.white),
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(100),
-                  color: AppColors.Pink),
-            ),
-          ),
-          InkWell(
-            child: Container(
-              margin: EdgeInsets.only(right: 4),
-              padding: EdgeInsets.all(4),
-              child: Icon(Icons.add, color: Colors.white),
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(100),
-                  color: AppColors.Purple),
-            ),
-          ),
-        ],
+       
       ),
-      body: Column(
-        children: [
-          Container(
-              width: double.infinity,
-              padding: EdgeInsets.fromLTRB(16, 0, 16, 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Bạn bè',
-                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
-                  ),
-                  SizedBox(
-                    height: 16,
-                  ),
-                  Obx(() => Container(
-                        width: double.infinity,
-                        height: 120,
-                        child: ListView.separated(
-                          shrinkWrap: true,
-                          scrollDirection: Axis.horizontal,
-                          itemBuilder: (context, index) {
-                            return friendItem(controller.listFriend[index]);
-                          },
-                          itemCount: controller.listFriend.length,
-                          separatorBuilder: (context, index) =>
-                              SizedBox(width: 12),
-                        ),
-                      ))
-                ],
-              )),
-          Expanded(
-            child: Container(
-              width: Get.width,
-              padding: EdgeInsets.all(20),
-              child: Obx(() => ListView.builder(
-                  itemCount: controller.listConversation.length,
-                  itemBuilder: (context, index) {
-                    ConversationResponse item =
-                        controller.listConversation[index];
-                    return conversationItem(
-                        item.conversationAvatar,
-                        item.conversationName,
-                        item.lastMessage.content ?? "",
-                        '2 min ago',
-                        item);
-                  })),
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(30), color: Colors.white),
-            ),
-          )
-        ],
+      body: RefreshIndicator(
+        onRefresh: () async {
+          controller.listConversation.value = await controller.onLoadConversation() ?? [];
+        },
+        child: Column(
+          children: [
+            Container(
+                width: double.infinity,
+                padding: EdgeInsets.fromLTRB(16, 0, 16, 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Bạn bè',
+                      style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+                    ),
+                    SizedBox(
+                      height: 16,
+                    ),
+                    Obx(() => Container(
+                          width: double.infinity,
+                          height: 120,
+                          child: ListView.separated(
+                            shrinkWrap: true,
+                            scrollDirection: Axis.horizontal,
+                            itemBuilder: (context, index) {
+                              return friendItem(controller.listFriend[index]);
+                            },
+                            itemCount: controller.listFriend.length,
+                            separatorBuilder: (context, index) =>
+                                SizedBox(width: 12),
+                          ),
+                        ))
+                  ],
+                )),
+            Expanded(
+              child: Container(
+                width: Get.width,
+                padding: EdgeInsets.all(20),
+                child: Obx(() => ListView.builder(
+                    itemCount: controller.listConversation.length,
+                    itemBuilder: (context, index) {
+                      ConversationResponse item =
+                          controller.listConversation[index];
+                      return conversationItem(
+                          item.conversationAvatar,
+                          item.conversationName,
+                          item.lastMessage.content ?? "",
+                          timeago.format(item.lastMessage.sentAt!.add(Duration(hours: 7)),locale: 'vn'),
+                          item);
+                    })),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30), color: Colors.white),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

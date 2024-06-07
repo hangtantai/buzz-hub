@@ -7,11 +7,39 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
+class LoaderDialog {
+  static Future<void> showLoadingDialog(
+      BuildContext context, GlobalKey key) async {
+    var wid = MediaQuery.of(context).size.width / 4;
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+            key: key,
+            backgroundColor: Colors.white,
+            child: Container(
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: Colors.white,
+              ),
+              width: wid,
+              height: wid,
+              child: Image.asset(
+                'assets/images/loader.gif',
+              ),
+            ));
+      },
+    );
+  }
+}
+
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
   LoginController controller = Get.put(LoginController());
   static CurrentUserResponse? currentUser;
-
+  final GlobalKey<State> _LoaderDialog = new GlobalKey<State>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,6 +87,7 @@ class LoginPage extends StatelessWidget {
               const SizedBox(height: 30),
               TextField(
                 controller: controller.passwordCtrl,
+                obscureText: true,
                 decoration: const InputDecoration(
                     enabledBorder: UnderlineInputBorder(
                       borderSide: BorderSide(
@@ -76,13 +105,19 @@ class LoginPage extends StatelessWidget {
               ),
               InkWell(
                 onTap: () async {
+                  LoaderDialog.showLoadingDialog(context, _LoaderDialog);
                   bool isSuccess = await controller.onLogin();
                   if (isSuccess) {
+                    Navigator.of(_LoaderDialog.currentContext!,
+                            rootNavigator: true)
+                        .pop();
                     LoginPage.currentUser = await controller.getCurrentUser();
-                    print(
-                        "==================current: ${LoginPage.currentUser!.fullName}");
+
                     Get.to(RootViewScreen());
                   } else {
+                    Navigator.of(_LoaderDialog.currentContext!,
+                            rootNavigator: true)
+                        .pop();
                     showDialog<void>(
                       context: context,
                       builder: (BuildContext context) {

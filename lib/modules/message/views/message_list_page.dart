@@ -36,6 +36,35 @@ class MessageListPage extends StatefulWidget {
   State<MessageListPage> createState() => _MessageListPageState();
 }
 
+
+class LoaderDialog {
+  static Future<void> showLoadingDialog(
+      BuildContext context, GlobalKey key) async {
+    var wid = MediaQuery.of(context).size.width / 4;
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+            key: key,
+            backgroundColor: Colors.white,
+            child: Container(
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: Colors.white,
+              ),
+              width: wid,
+              height: wid,
+              child: Image.asset(
+                'assets/images/loader.gif',
+              ),
+            ));
+      },
+    );
+  }
+}
+
 class _MessageListPageState extends State<MessageListPage> {
   List<types.Message> _messages = [];
   final _user = types.User(
@@ -43,14 +72,18 @@ class _MessageListPageState extends State<MessageListPage> {
       imageUrl:
           'https://goexjtmckylmpnrbxtcn.supabase.co/storage/v1/object/public/users-avatar/' +
               LoginPage.currentUser!.avatarUrl!);
-
+  final GlobalKey<State> _LoaderDialog = new GlobalKey<State>();
   List<StreamSubscription> subscriptions = [];
   ConversationService service = ConversationService();
 
   @override
   void initState() {
     super.initState();
-    _loadMessages();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      LoaderDialog.showLoadingDialog(context, _LoaderDialog);
+      _loadMessages();
+    });
+   
     subscriptions.addAll([
       LoginController.messageReceivedStreamCtrl.stream.listen((message) {
         if (message.messageType == "text") {
@@ -276,6 +309,7 @@ class _MessageListPageState extends State<MessageListPage> {
     setState(() {
       _messages = convertMessageToWidget(messages!);
     });
+     Navigator.of(_LoaderDialog.currentContext!, rootNavigator: true).pop();
   }
 
   @override
@@ -353,7 +387,7 @@ List<types.Message> convertMessageToWidget(List<MessageResponse> messageList) {
             id: message.senderId!,
             imageUrl:
                 'https://goexjtmckylmpnrbxtcn.supabase.co/storage/v1/object/public/users-avatar/user-ronaldo'),
-        createdAt: 1,
+        createdAt: convertDateTimeToTimestamp(message.sentAt!.add(Duration(hours: 7))),
         id: const Uuid().v4(),
         text: message.content!,
       );
@@ -366,7 +400,7 @@ List<types.Message> convertMessageToWidget(List<MessageResponse> messageList) {
             id: message.senderId!,
             imageUrl:
                 'https://goexjtmckylmpnrbxtcn.supabase.co/storage/v1/object/public/users-avatar/user-ronaldo'),
-        createdAt: 1,
+        createdAt: convertDateTimeToTimestamp(message.sentAt!.add(Duration(hours: 7))),
         id: const Uuid().v4(),
         height: image.height,
         name: '',
@@ -378,4 +412,8 @@ List<types.Message> convertMessageToWidget(List<MessageResponse> messageList) {
     }
   }
   return widgets;
+}
+
+int convertDateTimeToTimestamp(DateTime dateTime) {
+  return dateTime.millisecondsSinceEpoch ;
 }

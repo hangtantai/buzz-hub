@@ -1,6 +1,7 @@
 import 'package:buzz_hub/core/values/constant.dart';
 import 'package:buzz_hub/services/base_response.dart';
 import 'package:buzz_hub/services/dto/responses/get_all_user_response.dart';
+import 'package:buzz_hub/services/dto/responses/get_friend_request_response.dart';
 import 'package:dio/dio.dart';
 import 'package:buzz_hub/services/dto/requests/friend_request.dart';
 import 'package:http/http.dart' as http;
@@ -22,7 +23,7 @@ class FriendRequestService {
           'Content-Type': 'application/json; charset=UTF-8',
           "Authorization": "Bearer $accessToken"
         },
-        body: jsonEncode({'receiverId': request.receiverId}),   
+        body: jsonEncode({'receiverId': request.receiverId}),
       );
 
       if (response.statusCode == 200) {
@@ -30,7 +31,8 @@ class FriendRequestService {
         print('Friend request sent successfully');
       } else {
         // Request failed
-        print('Failed to send friend request. Status code: ${response.statusCode}');
+        print(
+            'Failed to send friend request. Status code: ${response.statusCode}');
         print('Response body: ${response.body}');
         // You might want to throw an exception here to handle the error properly
         // throw Exception('Failed to send friend request');
@@ -39,6 +41,57 @@ class FriendRequestService {
       print('Error sending friend request: $e');
       // Handle the exception, maybe rethrow or show an error message
       // throw Exception('Failed to send friend request');
+    }
+  }
+
+  Future<List<GetFriendRequestResponse>?> getAllFriendRequest() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? accessToken = prefs.getString(Constants.ACCESS_TOKEN);
+    final url = '${Constants.BASE_URL}/$endpoint/Received';
+    try {
+      final res = await Dio()
+          .get(url,
+              options: Options(headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer $accessToken",
+              }))
+          .then((value) {
+        List<dynamic> list = BaseResponse.fromJson(value.data).data;
+        List<GetFriendRequestResponse> requests = [];
+        for (var i in list) {
+          GetFriendRequestResponse reqResponse =
+              GetFriendRequestResponse.fromJson(i);
+          if (reqResponse.status == 'Pending') {
+            requests.add(reqResponse);
+          }
+        }
+        return requests;
+      });
+      return res;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<bool> AcceptFriendRequest(String userName) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? accessToken = prefs.getString(Constants.ACCESS_TOKEN);
+    final url = '${Constants.BASE_URL}/$endpoint/Accept/$userName';
+    try {
+      bool res = await Dio()
+          .get(url,
+              options: Options(headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer $accessToken",
+              }))
+          .then((value) {
+        bool result = BaseResponse.fromJson(value.data).success;
+        return result;
+      });
+
+      return res;
+    } catch (e) {
+      return false;
     }
   }
 }
