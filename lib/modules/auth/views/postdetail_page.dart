@@ -27,21 +27,23 @@ class PostDetailPage extends StatelessWidget {
     required this.post
   });
 
-  final List<Map<String, String>> comments = [
-    {
-      "avtPath": "lib/pics/avt.jpg",
-      "commentator": "Pirate",
-      "cmtContent": "Em dep lam!",
-      "isReply:": "false"
-    },
-    {
-      "avtPath": "lib/pics/avt1.jpg",
-      "commentator": "Jolie",
-      "cmtContent": "Gyatt !!",
-      "isReply:": "true"
-    },
-    // Add more sample comments if needed
-  ];
+  // final List<Map<String, String>> comments = [
+  //   {
+  //     "avtPath": "lib/pics/avt.jpg",
+  //     "commentator": "Pirate",
+  //     "cmtContent": "Em dep lam!",
+  //     "isReply:": "false"
+  //   },
+  //   {
+  //     "avtPath": "lib/pics/avt1.jpg",
+  //     "commentator": "Jolie",
+  //     "cmtContent": "Gyatt !!",
+  //     "isReply:": "true"
+  //   },
+  //   // Add more sample comments if needed
+  // ];
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -51,28 +53,25 @@ class PostDetailPage extends StatelessWidget {
         child: Column(
           children: [
             PostItem(post: PostResponse(
-              postId: "1",
-              textContent: "Test Content",
-              imageContent: [LoginPage.currentUser!.avatarUrl!],
-              author: LoginPage.currentUser!,
-              createdAt: DateTime.now()
+              postId: post.postId,
+              textContent: post.textContent,
+              imageContent: post.imageContent,
+              author: post.author,
+              createdAt: post.createdAt
             )),
             Divider(),
             // Comment input cell
-            CommentCell(
-              myAvt: LoginPage.currentUser!.avatarUrl!,
-              myName: LoginPage.currentUser!.userName!,
-            ),
+            CommentCell(),
 
             Divider(),
             // Display comments
-            for (var comment in comments)
-              CommentWidget(
-                avtPath: comment['avtPath']!,
-                commentator: comment['commentator']!,
-                cmtContent: comment['cmtContent']!,
-                isReply: comment['isReply'] == 'true',
-            ),            
+            // for (var comment in comments)
+            //   CommentWidget(
+            //     avtPath: comment['avtPath']!,
+            //     commentator: comment['commentator']!,
+            //     cmtContent: comment['cmtContent']!,
+            //     isReply: comment['isReply'] == 'true',
+            // ),            
           ],
         ),
       ),
@@ -128,13 +127,9 @@ class CommentWidget extends StatelessWidget {
 
 
 class CommentCell extends StatelessWidget {
-  final String myAvt;
-  final String myName;
 
   const CommentCell({
     Key? key,
-    required this.myAvt,
-    required this.myName,
   }) : super(key: key);
 
   @override
@@ -147,7 +142,9 @@ class CommentCell extends StatelessWidget {
           CircleAvatar(
             radius: 20, // Adjust the radius as needed
             backgroundImage: NetworkImage(
-              'https://goexjtmckylmpnrbxtcn.supabase.co/storage/v1/object/public/users-avatar/${LoginPage.currentUser!.avatarUrl!}'
+              LoginPage.currentUser!.avatarUrl != null
+                ?'${LoginPage.currentUser!.avatarUrl}'
+                : 'https://i.pinimg.com/736x/0d/64/98/0d64989794b1a4c9d89bff571d3d5842.jpg'
             ),
           ),
           const SizedBox(width: 8.0),
@@ -156,7 +153,7 @@ class CommentCell extends StatelessWidget {
           Expanded(
             child: TextField(
               decoration: InputDecoration(
-                hintText: 'Write a comment as ${myName}',
+                hintText: 'Write a comment as ${LoginPage.currentUser!.fullName!}',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(20.0),
                   borderSide: BorderSide.none,

@@ -11,9 +11,7 @@ import 'package:buzz_hub/modules/root_view/view/root_view_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:buzz_hub/modules/post/views/create_post_page.dart';
 import 'package:buzz_hub/modules/bookmarks/views/bookmarks_screen.dart';
-import 'package:buzz_hub/modules/bookmarks/views/bookmarks_null.dart';
 
 void main(List<String> arguments) async {
   HttpOverrides.global = MyHttpOverrides();
@@ -33,9 +31,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         fontFamily: 'Manrope',
       ),
-      //home: AccountDetailsPage(),
       home: LoginPage(),
-      // home: CreatePost(),
       debugShowCheckedModeBanner: false,
     );
   }

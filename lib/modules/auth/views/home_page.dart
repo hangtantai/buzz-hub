@@ -1,17 +1,47 @@
 import 'package:buzz_hub/core/values/app_colors.dart';
 import 'package:buzz_hub/modules/auth/views/login_page.dart';
-import 'package:buzz_hub/modules/auth/views/postdetail_page.dart';
 import 'package:buzz_hub/services/dto/responses/post_response.dart';
 import 'package:buzz_hub/widgets/post_clone_item.dart';
+import 'package:buzz_hub/services/post_service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:buzz_hub/modules/auth/controller/home_controller.dart';
 
-const String myAvtPath = 'lib/pics/avt.png';
-const String myName = 'Pirate';
+String? myAvtPath = LoginPage.currentUser?.avatarUrl;
+String? myName = LoginPage.currentUser?.fullName;
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
+
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  List<PostResponse>? postList;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchPosts();
+  }
+
+  Future<void> fetchPosts() async {
+    List<PostResponse>? posts = await PostService().getAllPost();
+    setState(() {
+      postList = posts;
+      print(postList);
+      isLoading = false;
+    });
+  }
+
+  Future<void> _refresh() async {
+    setState(() {
+      isLoading = true;
+    });
+    await fetchPosts();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,8 +51,10 @@ class HomePage extends StatelessWidget {
         backgroundColor: Colors.white,
         leading: Container(
           padding: const EdgeInsets.only(left: 16.0), // Adjust the padding as needed
-          child: const CircleAvatar(
-            backgroundImage: AssetImage(myAvtPath),
+          child: CircleAvatar(
+            backgroundImage: NetworkImage(
+              'https://goexjtmckylmpnrbxtcn.supabase.co/storage/v1/object/public/users-avatar/${myAvtPath ?? ''}'
+            ),
           ),
         ),
         actions: [
@@ -37,51 +69,63 @@ class HomePage extends StatelessWidget {
           ),
         ],
       ),
-
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            PostItem(
-              post: 
-                PostResponse(
-                  postId: "1",
-                  textContent: "Content",
-                  imageContent: [LoginPage.currentUser!.avatarUrl!],
-                  author: LoginPage.currentUser!,
-                  createdAt: DateTime.now()
-                )
-            ),
-          ],
-        ),
-      ),
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : postList == null
+              ? Center(child: Text('No posts available'))
+              : RefreshIndicator(
+                  onRefresh: _refresh,
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: Column(
+                      children: postList!.map((p) => PostItem(post: p)).toList(),
+                    ),
+                  ),
+                ),
     );
   }
 }
 
-class AvatarWidget extends StatelessWidget {
-  final String imagePath;
-  final double R;
 
-  const AvatarWidget({
-    Key? key,
-    required this.imagePath,
-    required this.R,
-  }) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 16.0), // Adjust this value as needed
-      child: CircleAvatar(
-        radius: R,
-        backgroundImage:
-          NetworkImage(
-            'https://goexjtmckylmpnrbxtcn.supabase.co/storage/v1/object/public/users-avatar/${LoginPage.currentUser!.avatarUrl!}'
-          )
-      ),
-    );
-  }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// class AvatarWidget extends StatelessWidget {
+//   final String imagePath;
+//   final double R;
+
+//   const AvatarWidget({
+//     Key? key,
+//     required this.imagePath,
+//     required this.R,
+//   }) : super(key: key);
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Padding(
+//       padding: const EdgeInsets.only(right: 16.0), // Adjust this value as needed
+//       child: CircleAvatar(
+//         radius: R,
+//         backgroundImage:
+//           NetworkImage(
+//             'https://goexjtmckylmpnrbxtcn.supabase.co/storage/v1/object/public/users-avatar/${LoginPage.currentUser!.avatarUrl!}'
+//           )
+//       ),
+//     );
+//   }
+// }
 
 // class PostWidget extends StatefulWidget {
 //   final String avtPath;
