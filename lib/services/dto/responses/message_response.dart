@@ -14,6 +14,7 @@ class MessageResponse {
   final String? groupId;
   final String? senderName;
   final String? senderAvatar;
+  final DateTime? sentAt;
   // final List<ReactionResponse>? reactions;
   
 
@@ -25,6 +26,7 @@ class MessageResponse {
     this.groupId,
     this.senderName,
     this.senderAvatar,
+    this.sentAt
     // this.reactions,
   });
 
