@@ -17,11 +17,11 @@ class CreatePostController extends GetxController {
     return await _createPost(content, null); // Không có XFile cho bài viết chỉ có văn bản
   }
 
-  Future<bool> createMediaPost(String content, XFile xfile) async {
+  Future<bool> createMediaPost(String content, List<XFile> xfile) async {
     return await _createPost(content, xfile);
   }
 
-  Future<bool> _createPost(String content, [XFile? xfile]) async {
+  Future<bool> _createPost(String content, List<XFile>? xfile) async {
     isLoading.value = true;
     errorMessage.value = ""; 
     

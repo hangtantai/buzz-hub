@@ -285,13 +285,13 @@ void _showDeleteConfirmationDialog(BuildContext context) {
                         margin: const EdgeInsets.only(right: 10.0),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(25.0),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Colors.black45,
-                              offset: Offset(0, 5),
-                              blurRadius: 8.0,
-                            ),
-                          ],
+                          // boxShadow: const [
+                          //   BoxShadow(
+                          //     color: Colors.black45,
+                          //     offset: Offset(0, 5),
+                          //     blurRadius: 8.0,
+                          //   ),
+                          // ],
                           image: DecorationImage(
                             fit: BoxFit.cover,
                             image: NetworkImage(

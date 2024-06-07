@@ -4,6 +4,7 @@ import 'package:buzz_hub/modules/bookmarks/views/bookmarks_screen.dart';
 import 'package:buzz_hub/modules/account/views/accountdetails_page.dart';
 import 'package:buzz_hub/modules/friend_request/controller/friend_request_controller.dart';
 import 'package:buzz_hub/services/dto/responses/post_response.dart';
+import 'package:buzz_hub/services/friend_request_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -147,7 +148,8 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          automaticallyImplyLeading: user!.userName != LoginPage.currentUser!.userName,
+          automaticallyImplyLeading:
+              user!.userName != LoginPage.currentUser!.userName,
           title: Text("Trang cá nhân"),
           centerTitle: false,
           actions: [
@@ -221,26 +223,52 @@ class ProfileScreen extends StatelessWidget {
                               SizedBox(
                                 width: 20,
                               ),
-                              ElevatedButton(
-                                onPressed: () {
-                                  Get.to(FriendPage());
-                                  // write function here
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.white,
-                                  foregroundColor: Colors.black,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 16, vertical: 10),
-                                  textStyle: const TextStyle(fontSize: 16),
-                                ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text('Lời mời'),
-                                    Text('kết bạn'),
-                                  ],
-                                ),
-                              )
+                              user!.userName == LoginPage.currentUser!.userName
+                                  ? ElevatedButton(
+                                      onPressed: () {
+                                        Get.to(FriendPage());
+                                        // write function here
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.white,
+                                        foregroundColor: Colors.black,
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 16, vertical: 10),
+                                        textStyle:
+                                            const TextStyle(fontSize: 16),
+                                      ),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text('Lời mời'),
+                                          Text('kết bạn'),
+                                        ],
+                                      ),
+                                    )
+                                  : ElevatedButton(
+                                      onPressed: () {
+                                        FriendRequestService service =
+                                            FriendRequestService();
+                                        service.sendFriendRequest(user?.userName ?? '');
+                                        // write function here
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.white,
+                                        foregroundColor: Colors.black,
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 16, vertical: 10),
+                                        textStyle:
+                                            const TextStyle(fontSize: 16),
+                                      ),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text('Thêm bạn'),
+                                        ],
+                                      ),
+                                    )
                             ])
                       ],
                     ),

@@ -31,6 +31,7 @@ class _HomePageState extends State<HomePage> {
     List<PostResponse>? posts = await PostService().getAllPost();
     setState(() {
       postList = posts;
+      postList!.sort((a, b) => b.createdAt!.compareTo(a.createdAt!));
       print(postList);
       isLoading = false;
     });
@@ -50,16 +51,17 @@ class _HomePageState extends State<HomePage> {
         title: null, // Remove the 'Home' text
         backgroundColor: Colors.white,
         leading: Container(
-          padding: const EdgeInsets.only(left: 16.0), // Adjust the padding as needed
+          padding:
+              const EdgeInsets.only(left: 16.0), // Adjust the padding as needed
           child: CircleAvatar(
             backgroundImage: NetworkImage(
-              'https://goexjtmckylmpnrbxtcn.supabase.co/storage/v1/object/public/users-avatar/${myAvtPath ?? ''}'
-            ),
+                'https://goexjtmckylmpnrbxtcn.supabase.co/storage/v1/object/public/users-avatar/${myAvtPath ?? ''}'),
           ),
         ),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(left: 16, right: 16.0), // Adjust the padding as needed
+            padding: const EdgeInsets.only(
+                left: 16, right: 16.0), // Adjust the padding as needed
             child: IconButton(
               onPressed: () {
                 // Handle the onPressed event for the add icon
@@ -78,7 +80,8 @@ class _HomePageState extends State<HomePage> {
                   child: SingleChildScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
                     child: Column(
-                      children: postList!.map((p) => PostItem(post: p)).toList(),
+                      children:
+                          postList!.map((p) => PostItem(post: p)).toList(),
                     ),
                   ),
                 ),

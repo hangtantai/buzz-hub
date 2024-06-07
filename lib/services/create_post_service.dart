@@ -10,24 +10,29 @@ class CreatePostService {
 
   Future<void> createTextPost({required String postContent}) async {
     try {
-        var url = '${Constants.BASE_URL}/$endpoint?textContent=$postContent';
-        await _sendPostRequest(url, null); 
+      var url = '${Constants.BASE_URL}/$endpoint?textContent=$postContent';
+      await _sendPostRequest(url, null);
     } catch (e) {
-      rethrow; 
+      rethrow;
     }
   }
 
-  Future<void> createMediaPost(String postContent, XFile xfile) async {
-  try {
-    var url = '${Constants.BASE_URL}/$endpoint?textContent=$postContent';
-    File file = File(xfile.path);
-    String fileName = file.path.split('/').last;
-    FormData formData = FormData.fromMap({
-      "file": await MultipartFile.fromFile(file.path, filename: fileName),
-    });
-    await _sendPostRequest(url, formData);
-  } catch (e) {
-    rethrow;
+  Future<void> createMediaPost(String postContent, List<XFile> xfiles) async {
+    try {
+      var url = '${Constants.BASE_URL}/$endpoint?textContent=$postContent';
+
+      var formData = FormData();
+      for (XFile xfile in xfiles) {
+        File file = File(xfile.path);
+        String fileName = file.path.split('/').last;
+        formData.files.addAll([
+          MapEntry("imageContents",
+              await MultipartFile.fromFile(file.path, filename: fileName))
+        ]);
+      }
+      await _sendPostRequest(url, formData);
+    } catch (e) {
+      rethrow;
     }
   }
 
