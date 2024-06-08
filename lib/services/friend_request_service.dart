@@ -12,7 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class FriendRequestService {
   static const endpoint = 'Request';
 
-  Future<void> sendFriendRequest(FriendRequest request) async {
+  Future<void> sendFriendRequest(String receiverId) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       final String? accessToken = prefs.getString(Constants.ACCESS_TOKEN);
@@ -23,7 +23,7 @@ class FriendRequestService {
           'Content-Type': 'application/json; charset=UTF-8',
           "Authorization": "Bearer $accessToken"
         },
-        body: jsonEncode({'receiverId': request.receiverId}),
+        body: jsonEncode({'receiverId': receiverId}),
       );
 
       if (response.statusCode == 200) {

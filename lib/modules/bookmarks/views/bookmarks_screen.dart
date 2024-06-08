@@ -1,5 +1,7 @@
 import 'package:buzz_hub/core/values/app_colors.dart';
+import 'package:buzz_hub/modules/auth/views/login_page.dart';
 import 'package:buzz_hub/modules/bookmarks/views/bookmarks_null.dart';
+import 'package:buzz_hub/services/dto/responses/post_response.dart';
 import 'package:flutter/material.dart';
 import 'package:buzz_hub/modules/post/models/post_model.dart';
 import 'package:get/get.dart';
@@ -15,9 +17,7 @@ class BookMarks extends StatefulWidget {
 class _CreateBookmarks extends State<BookMarks> {
   bool isLiked = false, isBookmarked = false;
 
-  @override
-  Widget build(BuildContext context) {
-     Widget builtPost(int index) {
+  Widget builtPost(int index) {
     return Container(
       // constraints: const BoxConstraints.expand(),
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -44,8 +44,7 @@ class _CreateBookmarks extends State<BookMarks> {
                   )
                 ]),
             child: CircleAvatar(
-              backgroundImage: AssetImage(posts[index].imageAuthor)
-            ),
+                backgroundImage: AssetImage(posts[index].imageAuthor)),
           ),
           title: Text(
             posts[index].author,
@@ -88,10 +87,7 @@ class _CreateBookmarks extends State<BookMarks> {
                     ],
                     image: DecorationImage(
                         fit: BoxFit.cover,
-                        image: AssetImage(posts[index].imageContent)
-                  )
-                )
-              ),
+                        image: AssetImage(posts[index].imageContent)))),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
@@ -178,7 +174,7 @@ class _CreateBookmarks extends State<BookMarks> {
         )
       ]),
     );
-}
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -207,14 +203,14 @@ class _CreateBookmarks extends State<BookMarks> {
         backgroundColor: Colors.white,
         body: posts.isEmpty
             ? const BookMarksNull()
-        : Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: ListView.builder(
-            itemBuilder: (context, index) {
-              return builtPost(index);
-            },
-            itemCount: posts.length,
-          ),
-        ));
+            : Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: ListView.builder(
+                  itemBuilder: (context, index) {
+                    return builtPost(index);
+                  },
+                  itemCount: posts.length,
+                ),
+              ));
   }
 }

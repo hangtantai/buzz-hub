@@ -4,7 +4,7 @@ import 'package:buzz_hub/modules/bookmarks/views/bookmarks_screen.dart';
 import 'package:buzz_hub/modules/account/views/accountdetails_page.dart';
 import 'package:buzz_hub/modules/friend_request/controller/friend_request_controller.dart';
 import 'package:buzz_hub/services/dto/responses/post_response.dart';
-import 'package:buzz_hub/widgets/post_item.dart';
+import 'package:buzz_hub/services/friend_request_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -15,15 +15,22 @@ import 'package:buzz_hub/services/get_post_by_user.dart';
 import 'package:buzz_hub/modules/profile/views/friend_button.dart';
 import 'package:buzz_hub/services/dto/responses/post_user_response.dart';
 import 'package:buzz_hub/widgets/post_item_user.dart' as post_user;
-
-
-class ProfileScreen extends StatefulWidget {
 import 'package:buzz_hub/modules/profile/views/list_friend_page.dart';
 import 'package:buzz_hub/services/friend_service.dart';
+import 'package:intl/intl.dart';
 import 'package:timeago/timeago.dart' as timeago;
+
+import '../../../widgets/post_clone_item.dart';
 
 class Controller extends GetxController {
   var isFavorited = false.obs;
+  // RxList<PostResponse> listPost = RxList<PostResponse>([]);
+
+  @override
+  void onInit() async {
+    super.onInit();
+  }
+
   void toggleFavorite() {
     isFavorited.toggle();
   }
@@ -35,6 +42,15 @@ class Controller extends GetxController {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('You have saved this post!')),
     );
+  }
+
+  Future<List<PostResponse>?> onLoadPost(String userName) async {
+    final res = await PostServiceByUser().getPostByUser(userName ?? '');
+    if (res == null) {
+      return null;
+    }
+    res.sort(((a, b) => b.createdAt!.compareTo(a.createdAt!)));
+    return res;
   }
 }
 
@@ -112,29 +128,9 @@ class _FriendButtonState extends State<FriendButton> {
 
 class ProfileScreen extends StatelessWidget {
   final CurrentUserResponse? user;
-  const ProfileScreen({Key? key, this.user}) : super(key: key);
+  ProfileScreen({Key? key, this.user}) : super(key: key);
 
-  @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
-}
-
-
-class _ProfileScreenState extends State<ProfileScreen> {
-  late Future<List<PostUserResponse>?> futurePosts;
-
-
-  PostResponse postResponse = PostResponse(
-      postId: 1,
-      textContent:
-          "It is a long established fact that a reader will bee distracted by the readable content ... 100000000000000000000000000000000000000000000000000000000",
-      imageContent: [LoginPage.currentUser!.avatarUrl!],
-      author: LoginPage.currentUser,
-      createdAt: DateTime.now());
-
-  void initState() {
-    super.initState();
-    futurePosts = PostServiceByUser().getPostByUser(widget.user!.userName ?? 'ronaldo');
-  }
+  Controller controller = Get.put(Controller());
 
   void navigateToAccountDetailsPage() {
     Get.to(AccountDetailsPage());
@@ -152,13 +148,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back), // Use the back arrow icon
-            onPressed: () {
-              // Handle the back button press (e.g., navigate back)
-              Navigator.of(context).pop();
-            },
-          ),
+          automaticallyImplyLeading:
+              user!.userName != LoginPage.currentUser!.userName,
           title: Text("Trang cá nhân"),
           centerTitle: false,
           actions: [
@@ -185,7 +176,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         body: Container(
             width: double.infinity,
             height: Get.height - 80,
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(20.0),
             child: SingleChildScrollView(
               child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -221,58 +212,67 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   });
                             },
                             child: CircleAvatar(
-                              radius: 50,
-                              backgroundImage:
-                                  getAvatarImage(widget.user!),
+                              radius: 40,
+                              backgroundImage: getAvatarImage(user!),
                             )),
                         SizedBox(width: 20), // Add some space
-                        Row(children: [
-                          //   Column(
-                          //   crossAxisAlignment: CrossAxisAlignment.start,
-                          //   children: <Widget>[
-                          //     Text(
-                          //       '250K',
-                          //       style: TextStyle(
-                          //         fontSize: 20,
-                          //         fontWeight: FontWeight.bold,
-                          //       ),
-                          //     ),
-                          //     Text('Follower'), // Replace with actual number
-                          //   ],
-                          // ),
-                          // SizedBox(width: 10), // Add some space
-                          Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                const FriendButton(),
-                                SizedBox(
-                                  width: 20,
-                                ),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    Get.to(FriendPage());
-                                    // write function here
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.white,
-                                    foregroundColor: Colors.black,
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 16, vertical: 10),
-                                    textStyle: const TextStyle(fontSize: 16),
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text('Lời mời'),
-                                      Text('kết bạn'),
-                                    ],
-                                  ),
-                                )
-                              ])
-                        ])
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              const FriendButton(),
+                              SizedBox(
+                                width: 20,
+                              ),
+                              user!.userName == LoginPage.currentUser!.userName
+                                  ? ElevatedButton(
+                                      onPressed: () {
+                                        Get.to(FriendPage());
+                                        // write function here
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.white,
+                                        foregroundColor: Colors.black,
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 16, vertical: 10),
+                                        textStyle:
+                                            const TextStyle(fontSize: 16),
+                                      ),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text('Lời mời'),
+                                          Text('kết bạn'),
+                                        ],
+                                      ),
+                                    )
+                                  : ElevatedButton(
+                                      onPressed: () {
+                                        FriendRequestService service =
+                                            FriendRequestService();
+                                        service.sendFriendRequest(user?.userName ?? '');
+                                        // write function here
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.white,
+                                        foregroundColor: Colors.black,
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 16, vertical: 10),
+                                        textStyle:
+                                            const TextStyle(fontSize: 16),
+                                      ),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text('Thêm bạn'),
+                                        ],
+                                      ),
+                                    )
+                            ])
                       ],
                     ),
-                    SizedBox(width: 10), // Add some space
+                    SizedBox(width: 20), // Add some space
                     Row(
                       children: <Widget>[
                         Text(
@@ -285,67 +285,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Icon(Icons.check_circle, color: Colors.blue),
                       ],
                     ),
-                    Text('@search_id'), // Replace with actual search id
-                    SizedBox(height: 15),
-                    Text(
-                      'Bio text goes here, habit, interest, passion like this,...',
-                      style: TextStyle(color: Colors.black),
-                    ), // Replace with actual bio
-                    SizedBox(height: 5),
-                    Row(
-                      children: <Widget>[
-                        Icon(Icons.location_on),
-                        Text('Address'), // Replace with actual address
-                        Spacer(),
-                        Icon(Icons.cake),
-                        Text(
-                            'Date of Birth'), // Replace with actual date of birth
-                      ],
-                    ),
-                    SizedBox(height: 5),
+                    Text('@${user?.userName}'), //
+                    SizedBox(height: 8),
                     Row(
                       children: <Widget>[
                         Icon(Icons.link),
-                        Text('www.example.com'), // Replace with actual link
+                        Text('${user?.email}'),
+                        Spacer(),
+                        Icon(Icons.cake),
+                        Text(
+                            '${DateFormat('dd/MM/yyyy').format(user?.dob ?? DateTime(2017))}'), // Replace with actual date of birth
                       ],
                     ),
-                    SizedBox(height: 10),
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemBuilder: (context, index) {
-                        return PostItem(post: postResponse);
+                    SizedBox(height: 12),
+                    FutureBuilder(
+                      future: controller.onLoadPost(user?.userName ?? ''),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData && snapshot.data != null) {
+                          List<PostResponse> list = snapshot.data!;
+                          return ListView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemBuilder: (context, index) {
+                              return PostItem(post: list[index]);
+                            },
+                            itemCount: list.length,
+                          );
+                        }
+                        return SizedBox();
                       },
-                      itemCount: 3,
                     )
                   ]),
             )));
   }
 }
-
-// FutureBuilder<List<PostUserResponse>?>(
-//                       future: futurePosts,
-//                       builder: (context, snapshot) {
-//                         if (snapshot.connectionState == ConnectionState.waiting) {
-//                             return const Center(child: CircularProgressIndicator());
-//                           } else if (snapshot.hasError) {
-//                             return Center(child: Text('Error: ${snapshot.error}'));
-//                           } else if (snapshot.hasData && snapshot.data != null) {
-//                             List<PostUserResponse> posts = snapshot.data!.toList();
-//                             return ListView.builder(
-//                               itemCount: posts.length,
-//                               itemBuilder: (context, index) {
-//                                 final post = posts[index];
-//                                 // Use your PostItem widget here
-//                                 return postItemUser.PostItem(post: post);
-//                               },
-//                             );
-//                           } else {
-//                             return const Center(child: Text('No posts found.'));
-//                           }
-//                       }
-//                     ),
-
 
 class FriendRequest {
   final AssetImage avatarUrl;
@@ -463,17 +436,15 @@ class FriendPage extends StatelessWidget {
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: ElevatedButton(
-                                    onPressed: () async{
+                                    onPressed: () async {
                                       bool isSuccess = await controller
                                           .onDecline(friend.userId!);
 
-                                          if(isSuccess){
-
-                                                    controller.listRequest
-                                                        .value = await controller
-                                                            .onLoadRequest() ??
-                                                        [];
-                                          }
+                                      if (isSuccess) {
+                                        controller.listRequest.value =
+                                            await controller.onLoadRequest() ??
+                                                [];
+                                      }
                                     },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: AppColors.Grey,

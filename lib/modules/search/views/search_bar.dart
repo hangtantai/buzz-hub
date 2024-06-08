@@ -270,20 +270,82 @@ class CustomSearchDelegate extends SearchDelegate {
     if (query.isEmpty) {
       return Container();
     }
-    List<String> matchQuery = [];
+    List<UserResponse> matchUser = allUser.where((user) => user.userName.toLowerCase().contains(query.toLowerCase())).toList();
 
-    for (var item in allUser) {
-      if (item.userName.toLowerCase().contains(query.toLowerCase())) {
-        matchQuery.add(item.userName);
-      }
+    // 8. Separate function for friend button logic
+    Widget _buildFriendButton(UserResponse user) {
+      return FutureBuilder<bool?>(
+        future: service.checkFriendStatus(user.userName),
+        builder: (BuildContext context, AsyncSnapshot<bool?> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return CircularProgressIndicator();
+          } else {
+            bool? isRequest = snapshot.data;
+            return ElevatedButton(
+              onPressed: () async {
+                // ... (Your existing friend request/unfriend logic)
+              },
+              style: ElevatedButton.styleFrom(
+                // 9. Customize button style
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                textStyle: TextStyle(fontSize: 16),
+                backgroundColor: user.isFriend
+                    ? Colors.red
+                    : (isRequest == true ? Colors.orange : Colors.green),
+              ),
+              child: Text(
+                user.isFriend
+                    ? 'Unfriend'
+                    : (isRequest == true ? 'Request Sent' : 'Add Friend'),
+              ),
+            );
+          }
+        },
+      );
     }
 
     return ListView.builder(
-      itemCount: matchQuery.length,
+      itemCount: matchUser.length,
       itemBuilder: (context, index) {
-        var result = matchQuery[index];
-        return ListTile(
-          title: Text(result),
+        var user = matchUser[index];
+        return Card( // 1. Encapsulate each result in a Card
+          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          elevation: 2, // 2. Add subtle elevation for depth
+          child: InkWell( // 3. Make the entire card tappable
+            onTap: () {
+              // TODO: Navigate to user profile or details page
+              Get.to(() => profile.ProfileScreen(user: mapToUserResponse(user))); 
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center, // 4. Center vertically
+                children: [
+                  CircleAvatar(
+                    radius: 30, // 5. Adjust avatar size
+                    backgroundImage: getAvatarImage(user),
+                  ),
+                  SizedBox(width: 16),
+                  Expanded( // 6. Allow username to take up available space
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          user.userName,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500, // 7. Use a suitable font weight
+                          ),
+                        ),
+                        // You can add more user details here (e.g., email)
+                      ],
+                    ),
+                  ),
+                  _buildFriendButton(user), // 8. Separate button logic
+                ],
+              ),
+            ),
+          ),
         );
       },
     );
