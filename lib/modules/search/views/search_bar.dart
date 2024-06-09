@@ -3,14 +3,13 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:buzz_hub/modules/profile/views/profile.dart' as profile;
 import 'package:buzz_hub/services/dto/responses/current_user_response.dart';
-import 'package:buzz_hub/modules/search/controller/search_bar_controller.dart';
 import 'package:buzz_hub/services/get_all_user_service.dart';
 import 'package:buzz_hub/services/dto/responses/get_all_user_response.dart';
 import 'package:buzz_hub/services/dto/requests/friend_request.dart';
 import  'package:buzz_hub/core/values/constant.dart';
 import 'package:buzz_hub/services/friend_request_service.dart';
 import 'package:buzz_hub/services/check_status_friend.dart';
-
+import 'package:buzz_hub/modules/auth/views/login_page.dart';
 
 class MySearchBarApp extends StatefulWidget {
   @override
@@ -21,6 +20,7 @@ class _MySearchBarAppState extends State<MySearchBarApp> {
   List<UserResponse>? allUser;
   // Assuming you have an instance of FriendService
   FriendRequest friendRequest = FriendRequest(receiverId: 'string');
+  
 
   @override
   void initState() {
@@ -80,6 +80,8 @@ class _MySearchBarAppState extends State<MySearchBarApp> {
 
 
 
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -92,7 +94,7 @@ class _MySearchBarAppState extends State<MySearchBarApp> {
                 // Navigate to the profile page
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => profile.ProfileScreen()),
+                  MaterialPageRoute(builder: (context) => profile.ProfileScreen(user: LoginPage.currentUser!)),
                 );
               },
             child: CircleAvatar(
@@ -127,14 +129,6 @@ class _MySearchBarAppState extends State<MySearchBarApp> {
               ),
             ),
             SizedBox(width: 16), // Add spacing between search bar and button
-            IconButton(
-              onPressed: () {
-                // Handle button press
-              },
-              icon: Icon(
-                IconData(0xee36, fontFamily: 'MaterialIcons'),
-              ), // Replace with your desired non-text icon
-            ),
           ],
         ),
       ),
@@ -157,25 +151,13 @@ class _MySearchBarAppState extends State<MySearchBarApp> {
                         ),
                         ),
                     ),
-                    TextButton(
-                      onPressed: () {
-                        // Handle button press
-                      },
-                      child: Text(
-                        'View More',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        ),
-                    ),
                   ],
                 ),
                 Expanded(
                 child: GridView.count(
                   shrinkWrap: true,
                   // physics: NeverScrollableScrollPhysics(),
-                  crossAxisCount: 2,
+                  crossAxisCount: 1,
                   children: List.generate(4, (index) {
                     final articleData = getArticleData(index);
                     return ArticleCard(
@@ -205,25 +187,13 @@ class _MySearchBarAppState extends State<MySearchBarApp> {
                         ),
                       ),
                     ),
-                    TextButton(
-                onPressed: () {
-                  // Handle button press
-                },
-                child: Text(
-                  'View More',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  ),
-                ),
               ],
               ),
               Expanded(
                 child: GridView.count(
                   shrinkWrap: true,
                   // physics: NeverScrollableScrollPhysics(),
-                  crossAxisCount: 2,
+                  crossAxisCount: 1,
                   children: List.generate(4, (index) {
                     final articleData = getVideo(index);
                     return Video(
@@ -259,6 +229,19 @@ class CustomSearchDelegate extends SearchDelegate {
       }
     }
 
+    CurrentUserResponse? mapToUserResponse(UserResponse? user) {
+    if (user == null) return null;
+    return CurrentUserResponse(
+      user.userName,
+      user.fullName,
+      user.email,
+      user.avatarUrl,
+      user.dob,
+      user.gender,
+      user.isFriend,
+    );
+  }
+
   @override
   List<Widget> buildActions(BuildContext context) {
     return [
@@ -284,20 +267,85 @@ class CustomSearchDelegate extends SearchDelegate {
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    List<String> matchQuery = [];
+    if (query.isEmpty) {
+      return Container();
+    }
+    List<UserResponse> matchUser = allUser.where((user) => user.userName.toLowerCase().contains(query.toLowerCase())).toList();
 
-    for (var item in allUser) {
-      if (item.userName.toLowerCase().contains(query.toLowerCase())) {
-        matchQuery.add(item.userName);
-      }
+    // 8. Separate function for friend button logic
+    Widget _buildFriendButton(UserResponse user) {
+      return FutureBuilder<bool?>(
+        future: service.checkFriendStatus(user.userName),
+        builder: (BuildContext context, AsyncSnapshot<bool?> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return CircularProgressIndicator();
+          } else {
+            bool? isRequest = snapshot.data;
+            return ElevatedButton(
+              onPressed: () async {
+                // ... (Your existing friend request/unfriend logic)
+              },
+              style: ElevatedButton.styleFrom(
+                // 9. Customize button style
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                textStyle: TextStyle(fontSize: 16),
+                backgroundColor: user.isFriend
+                    ? Colors.red
+                    : (isRequest == true ? Colors.orange : Colors.green),
+              ),
+              child: Text(
+                user.isFriend
+                    ? 'Unfriend'
+                    : (isRequest == true ? 'Request Sent' : 'Add Friend'),
+              ),
+            );
+          }
+        },
+      );
     }
 
     return ListView.builder(
-      itemCount: matchQuery.length,
+      itemCount: matchUser.length,
       itemBuilder: (context, index) {
-        var result = matchQuery[index];
-        return ListTile(
-          title: Text(result),
+        var user = matchUser[index];
+        return Card( // 1. Encapsulate each result in a Card
+          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          elevation: 2, // 2. Add subtle elevation for depth
+          child: InkWell( // 3. Make the entire card tappable
+            onTap: () {
+              // TODO: Navigate to user profile or details page
+              Get.to(() => profile.ProfileScreen(user: mapToUserResponse(user))); 
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center, // 4. Center vertically
+                children: [
+                  CircleAvatar(
+                    radius: 30, // 5. Adjust avatar size
+                    backgroundImage: getAvatarImage(user),
+                  ),
+                  SizedBox(width: 16),
+                  Expanded( // 6. Allow username to take up available space
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          user.userName,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500, // 7. Use a suitable font weight
+                          ),
+                        ),
+                        // You can add more user details here (e.g., email)
+                      ],
+                    ),
+                  ),
+                  _buildFriendButton(user), // 8. Separate button logic
+                ],
+              ),
+            ),
+          ),
         );
       },
     );
@@ -307,110 +355,85 @@ class CustomSearchDelegate extends SearchDelegate {
   Widget buildResults(BuildContext context) {
     List<UserResponse> matchUser = allUser.where((user) => user.userName.toLowerCase().contains(query.toLowerCase())).toList();
 
+    // 8. Separate function for friend button logic
+    Widget _buildFriendButton(UserResponse user) {
+      return FutureBuilder<bool?>(
+        future: service.checkFriendStatus(user.userName),
+        builder: (BuildContext context, AsyncSnapshot<bool?> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return CircularProgressIndicator();
+          } else {
+            bool? isRequest = snapshot.data;
+            return ElevatedButton(
+              onPressed: () async {
+                // ... (Your existing friend request/unfriend logic)
+              },
+              style: ElevatedButton.styleFrom(
+                // 9. Customize button style
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                textStyle: TextStyle(fontSize: 16),
+                backgroundColor: user.isFriend
+                    ? Colors.red
+                    : (isRequest == true ? Colors.orange : Colors.green),
+              ),
+              child: Text(
+                user.isFriend
+                    ? 'Unfriend'
+                    : (isRequest == true ? 'Request Sent' : 'Add Friend'),
+              ),
+            );
+          }
+        },
+      );
+    }
 
     return ListView.builder(
       itemCount: matchUser.length,
       itemBuilder: (context, index) {
         var user = matchUser[index];
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.only(left: 12),
-              width: MediaQuery.of(context).size.width * 0.2,
-              child: CircleAvatar(
-                radius: 50,
-                backgroundImage: getAvatarImage(user),
-            ),
-            ),
-            SizedBox(
-            width: MediaQuery.of(context).size.width * 0.03,
-          ),
-          Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-                user.userName, // Display the username here
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            Container(
-              alignment: Alignment.centerRight,
-              margin: const EdgeInsets.only(right: 12),
-              padding: const EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                color: Colors.transparent,
-                borderRadius: BorderRadius.circular(2),
-                border: Border.all(
-                  color: Color(0xFFF2F2F2),
-                ),
-              ),
-              child: ElevatedButton(
-                onPressed: () async {
-                  if (user.isFriend) {
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: Text('Unfriend ${user.userName}?'),
-                        content: Text('Are you sure you want to unfriend ${user.userName}?'),
-                        actions: [
-                          TextButton(
-                            onPressed: () async {
-                              // try {
-                              //   await friendRequestService.unfriendUser(user.userName);
-                              //   Navigator.pop(context);
-                              //   // Update the user's friend status here
-                              // } catch (e) {
-                              //   // Handle the exception here
-                              // }
-                            },
-                            child: Text('Yes'),
+        return Card( // 1. Encapsulate each result in a Card
+          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          elevation: 2, // 2. Add subtle elevation for depth
+          child: InkWell( // 3. Make the entire card tappable
+            onTap: () {
+              // TODO: Navigate to user profile or details page
+              Get.to(() => profile.ProfileScreen(user: mapToUserResponse(user))); 
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center, // 4. Center vertically
+                children: [
+                  CircleAvatar(
+                    radius: 30, // 5. Adjust avatar size
+                    backgroundImage: getAvatarImage(user),
+                  ),
+                  SizedBox(width: 16),
+                  Expanded( // 6. Allow username to take up available space
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          user.userName,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500, // 7. Use a suitable font weight
                           ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: Text('No'),
-                          )
-                        ]
-                      )
-                    );
-                  } else {
-                    try {
-                      await friendRequestService.sendFriendRequest(FriendRequest(
-                        receiverId: user.userName,
-                      ));
-                      // Update the user's friend status here
-                    } catch (e) {
-                      // Handle the exception here
-                    }
-                  }
-                },
-                child: FutureBuilder<bool?>(
-                      future: service.checkFriendStatus(user.userName),
-                      builder: (BuildContext context, AsyncSnapshot<bool?> snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return CircularProgressIndicator();  // Show a loading spinner while waiting
-                        } else {
-                          bool? isRequest = snapshot.data;
-                          return Text(
-                            user.isFriend ? 'Unfriend' : (isRequest == true ? 'Request Sent' : 'Add Friend'),
-                            style: TextStyle(
-                              color: user.isFriend ? Colors.red : (isRequest == true ? Colors.orange : Colors.green),
-                              fontSize: 16,
-                            ),
-                          );
-                        }
-                      },
-                    )
+                        ),
+                        // You can add more user details here (e.g., email)
+                      ],
+                    ),
+                  ),
+                  _buildFriendButton(user), // 8. Separate button logic
+                ],
               ),
-            )])
-          ]
+            ),
+          ),
         );
-      }
+      },
     );
+
+    
   }
 }
 

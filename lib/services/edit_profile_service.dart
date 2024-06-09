@@ -1,5 +1,4 @@
 import 'package:buzz_hub/core/values/constant.dart';
-import 'package:buzz_hub/services/base_response.dart';
 import 'package:buzz_hub/services/dto/requests/edit_user_request.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,7 +19,7 @@ class EditProfileService {
             ), 
             data: request.toJson()
           );
-      return res;//res.statusCode == 200; 
+      return res; 
     
   }
 }

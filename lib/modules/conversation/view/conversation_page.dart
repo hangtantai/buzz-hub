@@ -40,7 +40,10 @@ class ConversationPage extends StatelessWidget {
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          controller.listConversation.value = await controller.onLoadConversation() ?? [];
+          controller.listConversation.value = await controller.onLoadConversation()
+           ?? [];
+
+           controller.listFriend.value = await controller.onLoadFriend()??[];
         },
         child: Column(
           children: [
@@ -100,34 +103,35 @@ class ConversationPage extends StatelessWidget {
   }
 
   Widget friendItem(CurrentUserResponse user) {
-    return Container(
-      padding: EdgeInsets.all(16),
-      width: 100,
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12), color: Colors.white),
-      child: Column(
-        children: [
-          CircleAvatar(
-            radius: 30,
-            backgroundImage: NetworkImage(
-                'https://goexjtmckylmpnrbxtcn.supabase.co/storage/v1/object/public/users-avatar/' +
-                    user.avatarUrl!),
-          ),
-          SizedBox(
-            height: 8,
-          ),
-          Text(
-            user.fullName ?? "",
-            style: TextStyle(
-                fontWeight: FontWeight.w400,
-                color: AppColors.DarkBg,
-                fontSize: 12),
-            softWrap: false,
-            maxLines: 1,
-          )
-        ],
-      ),
-    );
+    return 
+      Container(
+        padding: EdgeInsets.all(16),
+        width: 100,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12), color: Colors.white),
+        child: Column(
+          children: [
+            CircleAvatar(
+              radius: 30,
+              backgroundImage: NetworkImage(
+                  'https://goexjtmckylmpnrbxtcn.supabase.co/storage/v1/object/public/users-avatar/' +
+                      user.avatarUrl!),
+            ),
+            SizedBox(
+              height: 8,
+            ),
+            Text(
+              user.fullName ?? "",
+              style: TextStyle(
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.DarkBg,
+                  fontSize: 12),
+              softWrap: false,
+              maxLines: 1,
+            )
+          ],
+        ),
+      );
   }
 
   Widget conversationItem(String avt, String name, String lastMsg,
